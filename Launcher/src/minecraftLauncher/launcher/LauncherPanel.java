@@ -20,6 +20,7 @@ import javax.swing.SwingConstants;
 import fr.theshark34.openauth.AuthenticationException;
 import fr.theshark34.openlauncherlib.launcher.util.UsernameSaver;
 import fr.theshark34.swinger.Swinger;
+import fr.theshark34.swinger.animation.Animator;
 import fr.theshark34.swinger.colored.SColoredBar;
 import fr.theshark34.swinger.event.SwingerEvent;
 import fr.theshark34.swinger.event.SwingerEventListener;
@@ -131,6 +132,8 @@ public class LauncherPanel extends JPanel implements SwingerEventListener
 						return;
 					}
 
+					saver.setUsername(usernameField.getText());
+					
 					try 
 					{
 						Launcher.update();
@@ -138,7 +141,8 @@ public class LauncherPanel extends JPanel implements SwingerEventListener
 					catch (Exception e) 
 					{
 						Launcher.interruptThread();
-						JOptionPane.showMessageDialog(LauncherPanel.this, "Erreur, mise à jour impossible", "Erreur", JOptionPane.ERROR_MESSAGE);
+						Launcher.getErrorUtil().catchError(e, "Mise à jour impossible !");
+						//JOptionPane.showMessageDialog(LauncherPanel.this, "Erreur, mise à jour impossible", "Erreur", JOptionPane.ERROR_MESSAGE);
 						setFieldsEnabled(true);
 						return;
 					}
@@ -150,7 +154,8 @@ public class LauncherPanel extends JPanel implements SwingerEventListener
 					catch (IOException e) 
 					{
 						Launcher.interruptThread();
-						JOptionPane.showMessageDialog(LauncherPanel.this, "Erreur, impossible de lacer le jeu", "Erreur", JOptionPane.ERROR_MESSAGE);
+						Launcher.getErrorUtil().catchError(e, "Impossible de lacer le jeu !");
+						//JOptionPane.showMessageDialog(LauncherPanel.this, "Erreur, impossible de lacer le jeu", "Erreur", JOptionPane.ERROR_MESSAGE);
 						setFieldsEnabled(true);
 						return;
 					}
@@ -160,7 +165,14 @@ public class LauncherPanel extends JPanel implements SwingerEventListener
 		}
 		else if (e.getSource() == quitButton)
 		{
-			System.exit(0);
+			Animator.fadeOutFrame(LauncherFrame.getInstance(), 2, new Runnable() {
+				
+				@Override
+				public void run() {
+					System.exit(0);
+					
+				}
+			});
 		}
 		else if (e.getSource() == hideButton)
 		{

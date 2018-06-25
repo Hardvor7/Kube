@@ -15,6 +15,7 @@ import fr.theshark34.openlauncherlib.launcher.GameLauncher;
 import fr.theshark34.openlauncherlib.launcher.GameTweak;
 import fr.theshark34.openlauncherlib.launcher.GameType;
 import fr.theshark34.openlauncherlib.launcher.GameVersion;
+import fr.theshark34.openlauncherlib.util.ErrorUtil;
 import fr.theshark34.supdate.BarAPI;
 import fr.theshark34.supdate.SUpdate;
 import fr.theshark34.supdate.application.integrated.FileDeleter;
@@ -25,9 +26,12 @@ public class Launcher
 	public static final GameVersion ML_VESRION = new GameVersion("1.12.2", GameType.V1_8_HIGHER);
 	public static final GameInfos ML_INFOS = new GameInfos("Minecraft Launcher 1", ML_VESRION, true, new GameTweak[] { GameTweak.FORGE });
 	public static final File ML_DIR = ML_INFOS.getGameDir();
+	public static final File ML_CRASH_DIR = new File(ML_DIR, "crashes");
 	
 	private static AuthInfos authInfos;
 	private static Thread updateThread;
+	
+	private static ErrorUtil errorUtil = new ErrorUtil(ML_CRASH_DIR);
 	
 	public static void auth(String username, String password) throws AuthenticationException
 	{
@@ -97,5 +101,10 @@ public class Launcher
 	public static void interruptThread()
 	{
 		updateThread.interrupt();
+	}
+	
+	public static ErrorUtil getErrorUtil()
+	{
+		return errorUtil;
 	}
 }
