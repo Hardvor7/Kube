@@ -24,14 +24,14 @@ import fr.theshark34.swinger.textured.STexturedButton;
 @SuppressWarnings("serial")
 public class LauncherPanel extends JPanel implements SwingerEventListener
 {
-	private Image background = Swinger.getResource("Background v1.1.png");
+	private Image background = Swinger.getResource("Background v1.2.png");
 	
 	private UsernameSaver saver = new UsernameSaver(Launcher.ML_INFOS);
 	
 	private JTextField usernameField = new JTextField(saver.getUsername(""));
 	private JTextField passwordField = new JPasswordField();
 	
-	private STexturedButton playButton = new STexturedButton(Swinger.getResource("play.png"));
+	private STexturedButton playButton = new STexturedButton(Swinger.getResource("PlayButton_no_Selected.png"));
 	private STexturedButton quitButton = new STexturedButton(Swinger.getResource("QuitButton_no_Selected.png"));
 	private STexturedButton hideButton = new STexturedButton(Swinger.getResource("HideButton_no_Selected.png"));
 	
@@ -41,42 +41,49 @@ public class LauncherPanel extends JPanel implements SwingerEventListener
 	public LauncherPanel() {
 		this.setLayout(null);
 		
+		// Translucid background
+		this.setBackground(new Color(1, 1, 1, 0));
+		
 		// Username Field
-		usernameField.setBounds(100, 100, 200, 30);
+		usernameField.setBounds(50, 100, 200, 20);
 		usernameField.setBackground(Color.WHITE);
-		usernameField.setFont(usernameField.getFont().deriveFont(20F));
+		usernameField.setFont(usernameField.getFont().deriveFont(15F));
 		this.add(usernameField);
 
 		
 		// Password Field
-		passwordField.setBounds(100, 150, 200, 30);
+		passwordField.setBounds(50, 130, 200, 20);
 		passwordField.setBackground(Color.WHITE);
-		passwordField.setFont(passwordField.getFont().deriveFont(20F));
+		passwordField.setFont(passwordField.getFont().deriveFont(15F));
 		this.add(passwordField);
 		
-		playButton.setBounds(130, 200);
+		playButton.setBounds(50, 170);
+		playButton.setSize(playButton.getSize().width / 3, playButton.getSize().height / 3);
+		
 		playButton.addEventListener(this);
 		this.add(playButton);
 		
-		quitButton.setBounds(1365 - 128, 0);
-		quitButton.setSize(128, 64);
+		quitButton.setBounds(400, 5);
+		quitButton.setSize(32, 16);
 		quitButton.setTextureHover(Swinger.getResource("QuitButton_selected.png"));
 		quitButton.addEventListener(this);
 		this.add(quitButton);
 		
-		hideButton.setBounds(1365-280, 0);
-		hideButton.setSize(128, 64);
+		hideButton.setBounds(360, 5);
+		hideButton.setSize(32, 16);
 		hideButton.setTextureHover(Swinger.getResource("HideButton_selected.png"));
 		hideButton.addEventListener(this);
 		this.add(hideButton);
 		
-		progressBar.setBounds(0, 748, 1365, 20);
+		progressBar.setBounds(5, 235, 470, 10);
 		this.add(progressBar);
 		
+		/*
 		infoLabel.setFont(infoLabel.getFont().deriveFont(20F));
 		infoLabel.setForeground(Color.WHITE);
-		infoLabel.setBounds(0, 710, 1365, 30);
+		infoLabel.setBounds(10, 20, 400, 30);
 		this.add(infoLabel);
+		*/
 	}
 
 
@@ -152,6 +159,7 @@ public class LauncherPanel extends JPanel implements SwingerEventListener
 	public void paintComponent(Graphics graphics)
 	{
 		super.paintComponent(graphics);
+
 		Swinger.drawFullsizedImage(graphics, this, background);
 	}
 	
