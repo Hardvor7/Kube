@@ -3,6 +3,7 @@ package minecraftLauncher.launcher;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Image;
+import java.io.IOException;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -121,8 +122,18 @@ public class LauncherPanel extends JPanel implements SwingerEventListener
 						setFieldsEnabled(true);
 						return;
 					}
-					
-					System.out.println("Logged in");
+
+					try 
+					{
+						Launcher.launch();
+					}
+					catch (IOException e) 
+					{
+						Launcher.interruptThread();
+						JOptionPane.showMessageDialog(LauncherPanel.this, "Erreur, impossible de lacer le jeu", "Erreur", JOptionPane.ERROR_MESSAGE);
+						setFieldsEnabled(true);
+						return;
+					}
 				}
 			};
 			t.start();
