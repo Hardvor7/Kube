@@ -29,8 +29,18 @@ public class KubeBootstrap
 
 	private static final CrashReporter K_B_CRASH_REPORTER = new CrashReporter("Kube Bootstrap", K_B_DIR);
 
+	private static String serverAddress = "robin-leclair.ovh";
+	
 	public static void main(String[] args)
 	{
+		if (args.length >= 1)
+		{
+			if (args[0].equals("local"))
+			{
+				serverAddress = "192.168.1.25";
+			}
+		}
+		
 		Swinger.setResourcePath("/kube/bootstrap/resources/");
 		showSplash();
 		
@@ -71,7 +81,7 @@ public class KubeBootstrap
 
 	private static void update() throws Exception
 	{
-		SUpdate su = new SUpdate("http://robin-leclair.ovh/KubeLauncher/bootstrap/", K_B_DIR);
+		SUpdate su = new SUpdate("http://" + serverAddress + "/KubeLauncher/bootstrap/", K_B_DIR);
 		su.getServerRequester().setRewriteEnabled(true);
 		su.addApplication(new FileDeleter());
 

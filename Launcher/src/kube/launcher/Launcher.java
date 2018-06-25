@@ -71,9 +71,8 @@ public class Launcher
 					LauncherFrame.getInstance().getLauncherPanel().getProgressBar().setMaximum(max);
 					LauncherFrame.getInstance().getLauncherPanel().getProgressBar().setValue(val);
 
-					LauncherFrame.getInstance().getLauncherPanel()
-							.setInfoText("Téléchargement des fichiers "
-									+ BarAPI.getNumberOfDownloadedFiles() / BarAPI.getNumberOfFileToDownload() + " "
+					LauncherFrame.getInstance().getLauncherPanel().setInfoText("Téléchargement des fichiers "
+									+ BarAPI.getNumberOfDownloadedFiles() + "/" + BarAPI.getNumberOfFileToDownload() + " "
 									+ Swinger.percentage(val, max) + "%");
 				}
 			}
