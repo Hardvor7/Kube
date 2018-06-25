@@ -5,12 +5,17 @@ import java.awt.Graphics;
 import java.awt.Image;
 
 import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 
+import fr.theshark34.openauth.AuthenticationException;
 import fr.theshark34.openlauncherlib.launcher.util.UsernameSaver;
 import fr.theshark34.swinger.Swinger;
+import fr.theshark34.swinger.colored.SColoredBar;
 import fr.theshark34.swinger.event.SwingerEvent;
 import fr.theshark34.swinger.event.SwingerEventListener;
 import fr.theshark34.swinger.textured.STexturedButton;
@@ -28,6 +33,9 @@ public class LauncherPanel extends JPanel implements SwingerEventListener
 	private STexturedButton playButton = new STexturedButton(Swinger.getResource("play.png"));
 	private STexturedButton quitButton = new STexturedButton(Swinger.getResource("QuitButton_no_Selected.png"));
 	private STexturedButton hideButton = new STexturedButton(Swinger.getResource("HideButton_no_Selected.png"));
+	
+	private SColoredBar progressBar = new SColoredBar(Swinger.getTransparentWhite(100), Swinger.getTransparentWhite(175));
+	private JLabel infoLabel = new JLabel("Click to Play !", SwingConstants.CENTER);
 	
 	public LauncherPanel() {
 		this.setLayout(null);
@@ -60,6 +68,14 @@ public class LauncherPanel extends JPanel implements SwingerEventListener
 		hideButton.setTextureHover(Swinger.getResource("HideButton_selected.png"));
 		hideButton.addEventListener(this);
 		this.add(hideButton);
+		
+		progressBar.setBounds(0, 748, 1365, 20);
+		this.add(progressBar);
+		
+		infoLabel.setFont(infoLabel.getFont().deriveFont(20F));
+		infoLabel.setForeground(Color.WHITE);
+		infoLabel.setBounds(0, 710, 1365, 30);
+		this.add(infoLabel);
 	}
 
 
@@ -69,7 +85,47 @@ public class LauncherPanel extends JPanel implements SwingerEventListener
 	{
 		if (e.getSource() == playButton)
 		{
+			setFieldsEnabled(false);
 			
+			if (usernameField.getText().replaceAll(" ", "").length() == 0 || passwordField.getText().length() == 0)
+			{
+				JOptionPane.showMessageDialog(this, "Erreur, identifiant ou mot de passe invalide", "Erreur", JOptionPane.ERROR_MESSAGE);
+				setFieldsEnabled(true);
+				return;
+			}
+			
+			Thread t = new Thread() 
+			{
+				@Override
+				public void run()
+				{
+					try 
+					{
+						Launcher.auth(usernameField.getText(), passwordField.getText());
+					}
+					catch (AuthenticationException e) 
+					{
+						JOptionPane.showMessageDialog(LauncherPanel.this, "Erreur, impossible de se connecter :" + e.getErrorModel().getErrorMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
+						setFieldsEnabled(true);
+						return;
+					}
+
+					try 
+					{
+						Launcher.update();
+					}
+					catch (Exception e) 
+					{
+						Launcher.interruptThread();
+						JOptionPane.showMessageDialog(LauncherPanel.this, "Erreur, mise à jour impossible", "Erreur", JOptionPane.ERROR_MESSAGE);
+						setFieldsEnabled(true);
+						return;
+					}
+					
+					System.out.println("Logged in");
+				}
+			};
+			t.start();
 		}
 		else if (e.getSource() == quitButton)
 		{
@@ -82,10 +138,25 @@ public class LauncherPanel extends JPanel implements SwingerEventListener
 	}
 
 	@Override
-	public void paintComponent(Graphics g)
+	public void paintComponent(Graphics graphics)
 	{
-		super.paintComponent(g);
-		
-		g.drawImage(background, 0, 0, this.getWidth(), this.getHeight(), this);
+		super.paintComponent(graphics);
+		Swinger.drawFullsizedImage(graphics, this, background);
+	}
+	
+	private void setFieldsEnabled(boolean enabled)
+	{
+		usernameField.setEnabled(enabled);
+		passwordField.setEnabled(enabled);
+	}
+	
+	public SColoredBar getProgressBar()
+	{
+		return progressBar;
+	}
+	
+	public void setInfoText(String text)
+	{
+		infoLabel.setText(text);
 	}
 }

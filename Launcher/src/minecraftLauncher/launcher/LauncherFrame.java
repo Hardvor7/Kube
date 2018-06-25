@@ -41,7 +41,7 @@ public class LauncherFrame extends JFrame
 		return instance;
 	}
 
-	public static LauncherPanel getLauncherPanel() 
+	public LauncherPanel getLauncherPanel() 
 	{
 		return launcherPanel;
 	}
