@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Image;
 
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
@@ -25,8 +26,8 @@ public class LauncherPanel extends JPanel implements SwingerEventListener
 	private JTextField passwordField = new JPasswordField();
 	
 	private STexturedButton playButton = new STexturedButton(Swinger.getResource("play.png"));
-	private STexturedButton quitButton = new STexturedButton(Swinger.getResource("quit.png"));
-	private STexturedButton hideButton = new STexturedButton(Swinger.getResource("hide.png"));
+	private STexturedButton quitButton = new STexturedButton(Swinger.getResource("QuitButton_no_Selected.png"));
+	private STexturedButton hideButton = new STexturedButton(Swinger.getResource("HideButton_no_Selected.png"));
 	
 	public LauncherPanel() {
 		this.setLayout(null);
@@ -48,11 +49,15 @@ public class LauncherPanel extends JPanel implements SwingerEventListener
 		playButton.addEventListener(this);
 		this.add(playButton);
 		
-		quitButton.setBounds(530, 100);
+		quitButton.setBounds(1365 - 128, 0);
+		quitButton.setSize(128, 64);
+		quitButton.setTextureHover(Swinger.getResource("QuitButton_selected.png"));
 		quitButton.addEventListener(this);
 		this.add(quitButton);
 		
-		hideButton.setBounds(530, 200);
+		hideButton.setBounds(1365-280, 0);
+		hideButton.setSize(128, 64);
+		hideButton.setTextureHover(Swinger.getResource("HideButton_selected.png"));
 		hideButton.addEventListener(this);
 		this.add(hideButton);
 	}
@@ -65,6 +70,14 @@ public class LauncherPanel extends JPanel implements SwingerEventListener
 		if (e.getSource() == playButton)
 		{
 			
+		}
+		else if (e.getSource() == quitButton)
+		{
+			System.exit(0);
+		}
+		else if (e.getSource() == hideButton)
+		{
+			LauncherFrame.getInstance().setState(JFrame.ICONIFIED);
 		}
 	}
 
