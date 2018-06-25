@@ -3,8 +3,12 @@ package minecraftLauncher.launcher;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Image;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -31,6 +35,8 @@ public class LauncherPanel extends JPanel implements SwingerEventListener
 	private JTextField usernameField = new JTextField(saver.getUsername(""));
 	private JTextField passwordField = new JPasswordField();
 	
+	private JLabel logoPan = new JLabel(new ImageIcon(Swinger.getResource("Logo v1.0_noBack.png").getScaledInstance(1920/8, 600/8, Image.SCALE_DEFAULT)));
+	
 	private STexturedButton playButton = new STexturedButton(Swinger.getResource("PlayButton_no_Selected.png"));
 	private STexturedButton quitButton = new STexturedButton(Swinger.getResource("QuitButton_no_Selected.png"));
 	private STexturedButton hideButton = new STexturedButton(Swinger.getResource("HideButton_no_Selected.png"));
@@ -56,6 +62,13 @@ public class LauncherPanel extends JPanel implements SwingerEventListener
 		passwordField.setBackground(Color.WHITE);
 		passwordField.setFont(passwordField.getFont().deriveFont(15F));
 		this.add(passwordField);
+		
+		// LogoImage
+		logoPan.setBounds(40, 20, 1920/8, 600/8);
+		
+		this.add(logoPan);
+
+		
 		
 		playButton.setBounds(50, 170);
 		playButton.setSize(playButton.getSize().width / 3, playButton.getSize().height / 3);
