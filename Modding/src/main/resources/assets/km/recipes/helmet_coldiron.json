@@ -1,0 +1,22 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern": 
+	[
+		"CCC",
+		"C C"
+	],
+
+	"key": 
+	{
+		"C": 
+		{
+			"item": "km:ingot_coldiron"
+		}
+	},
+
+	"result": 
+	{
+		"item": "km:helmet_coldiron",
+		"count": 1
+	}
+}

@@ -1,0 +1,23 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern": 
+	[
+		"C C",
+		"CCC",
+		"CCC"
+	],
+
+	"key": 
+	{
+		"C": 
+		{
+			"item": "km:ingot_coldiron"
+		}
+	},
+
+	"result": 
+	{
+		"item": "km:chestplate_coldiron",
+		"count": 1
+	}
+}

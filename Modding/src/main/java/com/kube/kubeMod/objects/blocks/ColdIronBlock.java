@@ -1,4 +1,4 @@
-package com.kube.kubeMod.blocks;
+package com.kube.kubeMod.objects.blocks;
 
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;

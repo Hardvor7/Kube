@@ -1,0 +1,28 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern": 
+	[
+		"C",
+		"S",
+		"S"
+	],
+
+	"key": 
+	{
+		"C": 
+		{
+			"item": "km:ingot_coldiron"
+		},
+
+		"S": 
+		{
+			"item": "minecraft:stick"
+		}
+	},
+
+	"result": 
+	{
+		"item": "km:shovel_coldiron",
+		"count": 1
+	}
+}

@@ -3,7 +3,7 @@ package com.kube.kubeMod.init;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.kube.kubeMod.blocks.ColdIronBlock;
+import com.kube.kubeMod.objects.blocks.ColdIronBlock;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;

@@ -1,0 +1,21 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern": 
+	[
+		"B"
+	],
+
+	"key": 
+	{
+		"B": 
+		{
+			"item": "km:block_coldiron"
+		}
+	},
+
+	"result": 
+	{
+		"item": "km:ingot_coldiron",
+		"count": 9
+	}
+}

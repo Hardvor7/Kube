@@ -6,6 +6,16 @@ item.ingot_coldiron.name=Cold Iron Ingot
 tile.block_coldiron.name=Cold Iron Block
 
 // Tools
+item.axe_coldiron.name=Cold Iron Axe
+item.hoe_coldiron.name=Cold Iron Hoe
+item.pickaxe_coldiron.name=Cold Iron Pickaxe
+item.shovel_coldiron.name=Cold Iron Shovel
+item.sword_coldiron.name=Cold Iron Sword
 
+// Armor
+item.helmet_coldiron.name=Cold Iron Helmet
+item.chestplate_coldiron.name=Cold Iron Chestplate
+item.leggings_coldiron.name=Cold Iron Leggings
+item.boots_coldiron.name=Cold Iron Boots
 
 // Entities

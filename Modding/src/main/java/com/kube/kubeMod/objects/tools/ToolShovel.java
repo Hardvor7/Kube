@@ -1,20 +1,20 @@
-package com.kube.kubeMod.items;
+package com.kube.kubeMod.objects.tools;
 
 import com.kube.kubeMod.Main;
 import com.kube.kubeMod.init.ItemInit;
 import com.kube.kubeMod.util.IHasModel;
 
 import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.item.Item;
+import net.minecraft.item.ItemSpade;
 
-public class ItemBase extends Item implements IHasModel
+public class ToolShovel extends ItemSpade implements IHasModel
 {
-	
-	public ItemBase(String name)
+	public ToolShovel(String name, ToolMaterial material)
 	{
+		super(material);
 		setUnlocalizedName(name);
 		setRegistryName(name);
-		setCreativeTab(CreativeTabs.MATERIALS);
+		setCreativeTab(CreativeTabs.TOOLS);
 		
 		ItemInit.ITEMS.add(this);
 	}
@@ -24,5 +24,4 @@ public class ItemBase extends Item implements IHasModel
 	{
 		Main.proxy.registerItemRenderer(this, 0, "inventory");
 	}
-	
 }

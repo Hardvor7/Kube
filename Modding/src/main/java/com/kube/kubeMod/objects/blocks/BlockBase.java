@@ -1,4 +1,4 @@
-package com.kube.kubeMod.blocks;
+package com.kube.kubeMod.objects.blocks;
 
 import com.kube.kubeMod.Main;
 import com.kube.kubeMod.init.BlockInit;
