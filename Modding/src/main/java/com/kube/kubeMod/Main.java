@@ -23,18 +23,18 @@ public class Main
     @EventHandler
     public static void preInit(FMLPreInitializationEvent event)
     {
-    	
+    	System.out.println("PretInit");
     }
 
     @EventHandler
     public static void init(FMLInitializationEvent event)
     {
-    	
+    	System.out.println("Init");
     }
 
     @EventHandler
     public static void postInit(FMLPostInitializationEvent event)
     {
-    	
+    	System.out.println("PostInit");
     }
 }
