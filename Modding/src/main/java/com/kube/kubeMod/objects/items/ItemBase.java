@@ -2,7 +2,6 @@ package com.kube.kubeMod.objects.items;
 
 import com.kube.kubeMod.Main;
 import com.kube.kubeMod.init.ItemInit;
-import com.kube.kubeMod.tabs.Tabs;
 import com.kube.kubeMod.util.IHasModel;
 
 import net.minecraft.item.Item;
@@ -14,7 +13,7 @@ public class ItemBase extends Item implements IHasModel
 	{
 		setUnlocalizedName(name);
 		setRegistryName(name);
-		setCreativeTab(Tabs.tabKubeMod);
+		setCreativeTab(Main.KUBE_TAB);
 		
 		ItemInit.ITEMS.add(this);
 	}
