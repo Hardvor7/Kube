@@ -4,7 +4,6 @@ import com.kube.kubeMod.Main;
 import com.kube.kubeMod.init.ItemInit;
 import com.kube.kubeMod.util.IHasModel;
 
-import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemArmor;
 
@@ -16,7 +15,7 @@ public class ArmorBase extends ItemArmor implements IHasModel
 		super(material, renderIndex, equipmentSlot);
 		setUnlocalizedName(name);
 		setRegistryName(name);
-		setCreativeTab(CreativeTabs.COMBAT);
+		setCreativeTab(Main.KUBE_TAB);
 
 		ItemInit.ITEMS.add(this);
 	}

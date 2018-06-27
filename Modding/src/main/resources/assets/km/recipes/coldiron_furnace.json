@@ -1,0 +1,33 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern": 
+	[
+		"CCC",
+		"CFC",
+		"CBC"
+	],
+
+	"key": 
+	{
+		"C": 
+		{
+			"item": "km:ingot_coldiron"
+		},
+
+		"B": 
+		{
+			"item": "km:block_coldiron"
+		},
+
+		"F": 
+		{
+			"item": "minecraft:furnace"
+		}
+	},
+
+	"result": 
+	{
+		"item": "km:coldiron_furnace",
+		"count": 1
+	}
+}

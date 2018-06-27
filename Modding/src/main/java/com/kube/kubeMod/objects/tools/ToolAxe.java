@@ -10,7 +10,6 @@ import com.kube.kubeMod.util.IHasModel;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemTool;
@@ -30,7 +29,7 @@ public class ToolAxe extends ItemTool implements IHasModel
 
 		setUnlocalizedName(name);
 		setRegistryName(name);
-		setCreativeTab(CreativeTabs.TOOLS);
+		setCreativeTab(Main.KUBE_TAB);
 
 		ItemInit.ITEMS.add(this);
 	}

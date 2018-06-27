@@ -1,9 +1,17 @@
 
-// Items
-item.ingot_coldiron.name=Cold Iron Ingot
+// Creative Tabs
+itemGroup.kube=Kube
 
 // Blocks
 tile.block_coldiron.name=Cold Iron Block
+tile.coldiron_furnace.name=Cold Iron Furnace
+
+// Machines
+container.coldiron_furnace=Cold Iron Furnace
+
+
+// Items
+item.ingot_coldiron.name=Cold Iron Ingot
 
 // Tools
 item.axe_coldiron.name=Cold Iron Axe
@@ -19,6 +27,5 @@ item.leggings_coldiron.name=Cold Iron Leggings
 item.boots_coldiron.name=Cold Iron Boots
 
 // Entities
-
 //CreativeTabs
 itemGroup.tabKubeMod=Kube Mod

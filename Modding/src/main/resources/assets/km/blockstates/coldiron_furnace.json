@@ -1,0 +1,50 @@
+{
+	"variants": 
+	{
+		"burning=false,facing=north": 
+		{
+			"model": "km:coldiron_furnace"
+		},
+
+		"burning=false,facing=east": 
+		{
+			"model": "km:coldiron_furnace",
+			"y": 90
+		},
+
+		"burning=false,facing=south": 
+		{
+			"model": "km:coldiron_furnace",
+			"y": 180
+		},
+
+		"burning=false,facing=west": 
+		{
+			"model": "km:coldiron_furnace",
+			"y": 270
+		},
+
+		"burning=true,facing=north": 
+		{
+			"model": "km:lit_coldiron_furnace"
+		},
+
+		"burning=true,facing=east": 
+		{
+			"model": "km:lit_coldiron_furnace",
+			"y": 90
+		},
+
+		"burning=true,facing=south": 
+		{
+			"model": "km:lit_coldiron_furnace",
+			"y": 180
+		},
+
+		"burning=true,facing=west": 
+		{
+			"model": "km:lit_coldiron_furnace",
+			"y": 270
+		}
+	}
+}

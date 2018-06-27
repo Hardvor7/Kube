@@ -1,0 +1,13 @@
+{
+	"parent": "block/orientable",
+	"textures": 
+	{
+		"particle": "km:blocks/coldiron_furnace_front_off",
+		"up": "km:blocks/coldiron_furnace_top",
+		"down": "km:blocks/coldiron_furnace_top",
+		"north": "km:blocks/coldiron_furnace_front_on",
+		"east": "km:blocks/coldiron_furnace_side",
+		"south": "km:blocks/coldiron_furnace_side",
+		"west": "km:blocks/coldiron_furnace_side"
+	}
+}

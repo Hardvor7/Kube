@@ -1,5 +1,6 @@
 package com.kube.kubeMod.util.handler;
 
+import com.kube.kubeMod.Main;
 import com.kube.kubeMod.init.BlockInit;
 import com.kube.kubeMod.init.EntityInit;
 import com.kube.kubeMod.init.ItemInit;
@@ -11,6 +12,7 @@ import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.network.NetworkRegistry;
 
 @EventBusSubscriber
 public class RegisteryHandler 
@@ -25,6 +27,7 @@ public class RegisteryHandler
 	public static void onBlockRegister(RegistryEvent.Register<Block> event)
 	{
 		event.getRegistry().registerAll(BlockInit.BLOCKS.toArray(new Block[0]));
+		TileEntityHandler.registerTileEntities();
 	}
 	
 	@SubscribeEvent
@@ -47,5 +50,14 @@ public class RegisteryHandler
 	{
 		EntityInit.registerEntities();
 		RenderHandler.registerEntityRenderers();
+	}
+	
+	public static void initRegisteries()
+	{
+		NetworkRegistry.INSTANCE.registerGuiHandler(Main.instance, new GuiHandler());
+	}
+
+	public static void postInitRegisteries()
+	{
 	}
 }

@@ -4,7 +4,6 @@ import com.kube.kubeMod.Main;
 import com.kube.kubeMod.init.ItemInit;
 import com.kube.kubeMod.util.IHasModel;
 
-import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.ItemSpade;
 
 public class ToolShovel extends ItemSpade implements IHasModel
@@ -14,7 +13,7 @@ public class ToolShovel extends ItemSpade implements IHasModel
 		super(material);
 		setUnlocalizedName(name);
 		setRegistryName(name);
-		setCreativeTab(CreativeTabs.TOOLS);
+		setCreativeTab(Main.KUBE_TAB);
 		
 		ItemInit.ITEMS.add(this);
 	}

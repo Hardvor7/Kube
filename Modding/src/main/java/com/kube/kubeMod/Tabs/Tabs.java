@@ -1,4 +1,4 @@
-package com.kube.kubeMod.Tabs;
+package com.kube.kubeMod.tabs;
 
 import com.kube.kubeMod.init.ItemInit;
 
