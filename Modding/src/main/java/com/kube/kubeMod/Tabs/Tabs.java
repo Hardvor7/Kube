@@ -7,8 +7,8 @@ import net.minecraft.item.ItemStack;
 
 public class Tabs {
 
-	public static final CreativeTabs tabKubeMod = new CreativeTabs("tabTestMod") {
-	
+	public static final CreativeTabs tabKubeMod = new CreativeTabs("tabKubeMod") {
+
 		@Override
 		public ItemStack getTabIconItem() {
 			return new ItemStack(ItemInit.INGOT_COLDIRON);

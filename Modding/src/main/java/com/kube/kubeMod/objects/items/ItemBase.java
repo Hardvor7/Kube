@@ -1,6 +1,7 @@
 package com.kube.kubeMod.objects.items;
 
 import com.kube.kubeMod.Main;
+import com.kube.kubeMod.Tabs.Tabs;
 import com.kube.kubeMod.init.ItemInit;
 import com.kube.kubeMod.util.IHasModel;
 
@@ -14,7 +15,7 @@ public class ItemBase extends Item implements IHasModel
 	{
 		setUnlocalizedName(name);
 		setRegistryName(name);
-		setCreativeTab(CreativeTabs.MATERIALS);
+		setCreativeTab(Tabs.tabKubeMod);
 		
 		ItemInit.ITEMS.add(this);
 	}
