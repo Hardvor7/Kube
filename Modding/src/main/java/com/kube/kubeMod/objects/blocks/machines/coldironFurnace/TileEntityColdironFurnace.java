@@ -55,7 +55,7 @@ public class TileEntityColdironFurnace extends TileEntity implements IInventory,
 		return this.customName != null && !this.customName.isEmpty();
 	}
 
-	public void setCustomName(String customName)
+	public void setCustomInventoryName(String customName)
 	{
 		this.customName = customName;
 	}
@@ -137,7 +137,9 @@ public class TileEntityColdironFurnace extends TileEntity implements IInventory,
 		this.currentBurnTime = getItemBurnTime((ItemStack) this.furnaceItemStacks.get(1));
 
 		if (compound.hasKey("CustomName", 8))
-			this.setCustomName(compound.getString("CustomName"));
+		{
+			this.setCustomInventoryName(compound.getString("CustomName"));
+		}
 	}
 
 	@Override
@@ -183,8 +185,8 @@ public class TileEntityColdironFurnace extends TileEntity implements IInventory,
 		{
 			ItemStack stack = (ItemStack) this.furnaceItemStacks.get(1);
 
-			if (this.isBurning() || !stack.isEmpty() && !((ItemStack)this.furnaceItemStacks.get(0)).isEmpty())
-            {
+			if (this.isBurning() || !stack.isEmpty() && !((ItemStack) this.furnaceItemStacks.get(0)).isEmpty())
+			{
 				if (!this.isBurning() && this.canSmelt())
 				{
 					this.burnTime = getItemBurnTime(stack);
@@ -296,106 +298,107 @@ public class TileEntityColdironFurnace extends TileEntity implements IInventory,
 		}
 	}
 
-    /**
-     * Returns the number of ticks that the supplied fuel item will keep the furnace burning, or 0 if the item isn't
-     * fuel
-     */
-    public static int getItemBurnTime(ItemStack stack)
-    {
-        if (stack.isEmpty())
-        {
-            return 0;
-        }
-        else
-        {
-            int burnTime = net.minecraftforge.event.ForgeEventFactory.getItemBurnTime(stack);
-            if (burnTime >= 0) return burnTime;
-            Item item = stack.getItem();
+	/**
+	 * Returns the number of ticks that the supplied fuel item will keep the furnace
+	 * burning, or 0 if the item isn't fuel
+	 */
+	public static int getItemBurnTime(ItemStack stack)
+	{
+		if (stack.isEmpty())
+		{
+			return 0;
+		}
+		else
+		{
+			int burnTime = net.minecraftforge.event.ForgeEventFactory.getItemBurnTime(stack);
+			if (burnTime >= 0)
+				return burnTime;
+			Item item = stack.getItem();
 
-            if (item == Item.getItemFromBlock(Blocks.WOODEN_SLAB))
-            {
-                return 150;
-            }
-            else if (item == Item.getItemFromBlock(Blocks.WOOL))
-            {
-                return 100;
-            }
-            else if (item == Item.getItemFromBlock(Blocks.CARPET))
-            {
-                return 67;
-            }
-            else if (item == Item.getItemFromBlock(Blocks.LADDER))
-            {
-                return 300;
-            }
-            else if (item == Item.getItemFromBlock(Blocks.WOODEN_BUTTON))
-            {
-                return 100;
-            }
-            else if (Block.getBlockFromItem(item).getDefaultState().getMaterial() == Material.WOOD)
-            {
-                return 300;
-            }
-            else if (item == Item.getItemFromBlock(Blocks.COAL_BLOCK))
-            {
-                return 16000;
-            }
-            else if (item instanceof ItemTool && "WOOD".equals(((ItemTool)item).getToolMaterialName()))
-            {
-                return 200;
-            }
-            else if (item instanceof ItemSword && "WOOD".equals(((ItemSword)item).getToolMaterialName()))
-            {
-                return 200;
-            }
-            else if (item instanceof ItemHoe && "WOOD".equals(((ItemHoe)item).getMaterialName()))
-            {
-                return 200;
-            }
-            else if (item == Items.STICK)
-            {
-                return 100;
-            }
-            else if (item != Items.BOW && item != Items.FISHING_ROD)
-            {
-                if (item == Items.SIGN)
-                {
-                    return 200;
-                }
-                else if (item == Items.COAL)
-                {
-                    return 1600;
-                }
-                else if (item == Items.LAVA_BUCKET)
-                {
-                    return 20000;
-                }
-                else if (item != Item.getItemFromBlock(Blocks.SAPLING) && item != Items.BOWL)
-                {
-                    if (item == Items.BLAZE_ROD)
-                    {
-                        return 2400;
-                    }
-                    else if (item instanceof ItemDoor && item != Items.IRON_DOOR)
-                    {
-                        return 200;
-                    }
-                    else
-                    {
-                        return item instanceof ItemBoat ? 400 : 0;
-                    }
-                }
-                else
-                {
-                    return 100;
-                }
-            }
-            else
-            {
-                return 300;
-            }
-        }
-    }
+			if (item == Item.getItemFromBlock(Blocks.WOODEN_SLAB))
+			{
+				return 150;
+			}
+			else if (item == Item.getItemFromBlock(Blocks.WOOL))
+			{
+				return 100;
+			}
+			else if (item == Item.getItemFromBlock(Blocks.CARPET))
+			{
+				return 67;
+			}
+			else if (item == Item.getItemFromBlock(Blocks.LADDER))
+			{
+				return 300;
+			}
+			else if (item == Item.getItemFromBlock(Blocks.WOODEN_BUTTON))
+			{
+				return 100;
+			}
+			else if (Block.getBlockFromItem(item).getDefaultState().getMaterial() == Material.WOOD)
+			{
+				return 300;
+			}
+			else if (item == Item.getItemFromBlock(Blocks.COAL_BLOCK))
+			{
+				return 16000;
+			}
+			else if (item instanceof ItemTool && "WOOD".equals(((ItemTool) item).getToolMaterialName()))
+			{
+				return 200;
+			}
+			else if (item instanceof ItemSword && "WOOD".equals(((ItemSword) item).getToolMaterialName()))
+			{
+				return 200;
+			}
+			else if (item instanceof ItemHoe && "WOOD".equals(((ItemHoe) item).getMaterialName()))
+			{
+				return 200;
+			}
+			else if (item == Items.STICK)
+			{
+				return 100;
+			}
+			else if (item != Items.BOW && item != Items.FISHING_ROD)
+			{
+				if (item == Items.SIGN)
+				{
+					return 200;
+				}
+				else if (item == Items.COAL)
+				{
+					return 1600;
+				}
+				else if (item == Items.LAVA_BUCKET)
+				{
+					return 20000;
+				}
+				else if (item != Item.getItemFromBlock(Blocks.SAPLING) && item != Items.BOWL)
+				{
+					if (item == Items.BLAZE_ROD)
+					{
+						return 2400;
+					}
+					else if (item instanceof ItemDoor && item != Items.IRON_DOOR)
+					{
+						return 200;
+					}
+					else
+					{
+						return item instanceof ItemBoat ? 400 : 0;
+					}
+				}
+				else
+				{
+					return 100;
+				}
+			}
+			else
+			{
+				return 300;
+			}
+		}
+	}
 
 	public static boolean isItemFuel(ItemStack fuel)
 	{
@@ -432,50 +435,52 @@ public class TileEntityColdironFurnace extends TileEntity implements IInventory,
 		{
 			return true;
 		}
-        else
-        {
-            ItemStack itemstack = this.furnaceItemStacks.get(1);
-            return isItemFuel(stack) || SlotColdironFurnaceFuel.isBucket(stack) && itemstack.getItem() != Items.BUCKET;
-        }
+		else
+		{
+			ItemStack itemstack = this.furnaceItemStacks.get(1);
+			return isItemFuel(stack) || SlotColdironFurnaceFuel.isBucket(stack) && itemstack.getItem() != Items.BUCKET;
+		}
 	}
 
-    public int[] getSlotsForFace(EnumFacing side)
-    {
-        if (side == EnumFacing.DOWN)
-        {
-            return SLOTS_BOTTOM;
-        }
-        else
-        {
-            return side == EnumFacing.UP ? SLOTS_TOP : SLOTS_SIDES;
-        }
-    }
+	public int[] getSlotsForFace(EnumFacing side)
+	{
+		if (side == EnumFacing.DOWN)
+		{
+			return SLOTS_BOTTOM;
+		}
+		else
+		{
+			return side == EnumFacing.UP ? SLOTS_TOP : SLOTS_SIDES;
+		}
+	}
 
-    /**
-     * Returns true if automation can insert the given item in the given slot from the given side.
-     */
-    public boolean canInsertItem(int index, ItemStack itemStackIn, EnumFacing direction)
-    {
-        return this.isItemValidForSlot(index, itemStackIn);
-    }
+	/**
+	 * Returns true if automation can insert the given item in the given slot from
+	 * the given side.
+	 */
+	public boolean canInsertItem(int index, ItemStack itemStackIn, EnumFacing direction)
+	{
+		return this.isItemValidForSlot(index, itemStackIn);
+	}
 
-    /**
-     * Returns true if automation can extract the given item in the given slot from the given side.
-     */
-    public boolean canExtractItem(int index, ItemStack stack, EnumFacing direction)
-    {
-        if (direction == EnumFacing.DOWN && index == 1)
-        {
-            Item item = stack.getItem();
+	/**
+	 * Returns true if automation can extract the given item in the given slot from
+	 * the given side.
+	 */
+	public boolean canExtractItem(int index, ItemStack stack, EnumFacing direction)
+	{
+		if (direction == EnumFacing.DOWN && index == 1)
+		{
+			Item item = stack.getItem();
 
-            if (item != Items.WATER_BUCKET && item != Items.BUCKET)
-            {
-                return false;
-            }
-        }
+			if (item != Items.WATER_BUCKET && item != Items.BUCKET)
+			{
+				return false;
+			}
+		}
 
-        return true;
-    }
+		return true;
+	}
 
 	public String getGuiID()
 	{

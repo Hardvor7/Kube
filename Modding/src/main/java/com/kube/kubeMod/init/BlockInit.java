@@ -16,5 +16,6 @@ public class BlockInit
 	public static final Block BLOCK_COLDIRON = new ColdIronBlock("block_coldiron", Material.IRON);
 	
 
-	public static final Block COLDIRON_FURNACE = new BlockColdironFurnace("coldiron_furnace", Material.IRON);
+	public static final Block COLDIRON_FURNACE = new BlockColdironFurnace("coldiron_furnace", Material.IRON, false);
+	public static final Block LIT_COLDIRON_FURNACE = new BlockColdironFurnace("lit_coldiron_furnace", Material.IRON, true).setCreativeTab(null);
 }

@@ -8,6 +8,7 @@ import com.kube.kubeMod.init.ItemInit;
 
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
@@ -25,6 +26,7 @@ public class ColdironFurnaceRecipes
 	private ColdironFurnaceRecipes() 
 	{
 		addSmeltingRecipeForBlock(Blocks.IRON_ORE, new ItemStack(ItemInit.INGOT_COLDIRON), 1.0F);
+		addSmeltingRecipeForBlock(Blocks.DIAMOND_ORE, new ItemStack(Items.DIAMOND, 2), 1.0F);
 	}
 
 

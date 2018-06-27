@@ -18,11 +18,13 @@ import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.tileentity.TileEntityFurnace;
 import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
@@ -39,14 +41,21 @@ public class BlockColdironFurnace extends BlockBase implements ITileEntityProvid
 {
 
 	public static final PropertyDirection FACING = BlockHorizontal.FACING;
-	public static final PropertyBool BURNING = PropertyBool.create("burning");
+	private final boolean isBurning;
+	private static boolean keepInventory;
 
-	public BlockColdironFurnace(String name, Material material)
+	public BlockColdironFurnace(String name, Material material, boolean isBurning)
 	{
 		super(name, material);
 		setSoundType(SoundType.METAL);
-		this.setDefaultState(
-				this.blockState.getBaseState().withProperty(FACING, EnumFacing.NORTH).withProperty(BURNING, false));
+		setHardness(3.5F);
+		this.setDefaultState(this.blockState.getBaseState().withProperty(FACING, EnumFacing.NORTH));
+		this.isBurning = isBurning;
+
+		if (isBurning)
+		{
+			setLightLevel(0.875F);
+		}
 	}
 
 	@Override
@@ -109,7 +118,7 @@ public class BlockColdironFurnace extends BlockBase implements ITileEntityProvid
 	@SuppressWarnings("incomplete-switch")
 	public void randomDisplayTick(IBlockState stateIn, World worldIn, BlockPos pos, Random rand)
 	{
-		if (stateIn.getValue(BURNING))
+		if (this.isBurning)
 		{
 			EnumFacing enumfacing = (EnumFacing) stateIn.getValue(FACING);
 			double d0 = (double) pos.getX() + 0.5D;
@@ -149,17 +158,24 @@ public class BlockColdironFurnace extends BlockBase implements ITileEntityProvid
 	{
 		IBlockState state = worldIn.getBlockState(pos);
 		TileEntity tileEntity = worldIn.getTileEntity(pos);
+		keepInventory = true;
 
 		if (active)
 		{
-			worldIn.setBlockState(pos, BlockInit.COLDIRON_FURNACE.getDefaultState()
-					.withProperty(FACING, state.getValue(FACING)).withProperty(BURNING, true), 3);
+			worldIn.setBlockState(pos,
+					BlockInit.LIT_COLDIRON_FURNACE.getDefaultState().withProperty(FACING, state.getValue(FACING)), 3);
+			worldIn.setBlockState(pos,
+					BlockInit.LIT_COLDIRON_FURNACE.getDefaultState().withProperty(FACING, state.getValue(FACING)), 3);
 		}
 		else
 		{
-			worldIn.setBlockState(pos, BlockInit.COLDIRON_FURNACE.getDefaultState()
-					.withProperty(FACING, state.getValue(FACING)).withProperty(BURNING, false), 3);
+			worldIn.setBlockState(pos,
+					BlockInit.COLDIRON_FURNACE.getDefaultState().withProperty(FACING, state.getValue(FACING)), 3);
+			worldIn.setBlockState(pos,
+					BlockInit.COLDIRON_FURNACE.getDefaultState().withProperty(FACING, state.getValue(FACING)), 3);
 		}
+
+		keepInventory = false;
 
 		if (tileEntity != null)
 		{
@@ -187,40 +203,47 @@ public class BlockColdironFurnace extends BlockBase implements ITileEntityProvid
 	{
 		worldIn.setBlockState(pos,
 				this.getDefaultState().withProperty(FACING, placer.getHorizontalFacing().getOpposite()), 2);
+
+        if (stack.hasDisplayName())
+        {
+            TileEntity tileentity = worldIn.getTileEntity(pos);
+
+            if (tileentity instanceof TileEntityColdironFurnace)
+            {
+                ((TileEntityColdironFurnace)tileentity).setCustomInventoryName(stack.getDisplayName());
+            }
+        }
 	}
 
 	@Override
 	public void breakBlock(World worldIn, BlockPos pos, IBlockState state)
 	{
-		TileEntityColdironFurnace tileentity = (TileEntityColdironFurnace) worldIn.getTileEntity(pos);
-		InventoryHelper.dropInventoryItems(worldIn, pos, tileentity);
-		super.breakBlock(worldIn, pos, state);
+        if (!keepInventory)
+        {
+            TileEntity tileentity = worldIn.getTileEntity(pos);
+
+            if (tileentity instanceof TileEntityColdironFurnace)
+            {
+                InventoryHelper.dropInventoryItems(worldIn, pos, (TileEntityColdironFurnace)tileentity);
+            }
+        }
+
+        super.breakBlock(worldIn, pos, state);
 	}
 
-	@Override
+	/**
+	 * The type of render function called. MODEL for mixed tesr and static model,
+	 * MODELBLOCK_ANIMATED for TESR-only, LIQUID for vanilla liquids, INVISIBLE to
+	 * skip all rendering
+	 */
 	public EnumBlockRenderType getRenderType(IBlockState state)
 	{
 		return EnumBlockRenderType.MODEL;
 	}
 
-	@Override
-	public IBlockState withRotation(IBlockState state, Rotation rot)
-	{
-		return state.withProperty(FACING, rot.rotate((EnumFacing) state.getValue(FACING)));
-	}
-
-	@Override
-	public IBlockState withMirror(IBlockState state, Mirror mirrorIn)
-	{
-		return state.withRotation(mirrorIn.toRotation((EnumFacing) state.getValue(FACING)));
-	}
-
-	@Override
-	protected BlockStateContainer createBlockState()
-	{
-		return new BlockStateContainer(this, new IProperty[] { BURNING, FACING });
-	}
-
+	/**
+	 * Convert the given metadata into a BlockState for this Block
+	 */
 	@Override
 	public IBlockState getStateFromMeta(int meta)
 	{
@@ -230,10 +253,38 @@ public class BlockColdironFurnace extends BlockBase implements ITileEntityProvid
 		return this.getDefaultState().withProperty(FACING, facing);
 	}
 
+	/**
+	 * Convert the BlockState into the correct metadata value
+	 */
 	@Override
 	public int getMetaFromState(IBlockState state)
 	{
 		return ((EnumFacing) state.getValue(FACING)).getIndex();
 	}
 
+	/**
+	 * Returns the blockstate with the given rotation from the passed blockstate. If
+	 * inapplicable, returns the passed blockstate.
+	 */
+	@Override
+	public IBlockState withRotation(IBlockState state, Rotation rot)
+	{
+		return state.withProperty(FACING, rot.rotate((EnumFacing) state.getValue(FACING)));
+	}
+
+	/**
+	 * Returns the blockstate with the given mirror of the passed blockstate. If
+	 * inapplicable, returns the passed blockstate.
+	 */
+	@Override
+	public IBlockState withMirror(IBlockState state, Mirror mirrorIn)
+	{
+		return state.withRotation(mirrorIn.toRotation((EnumFacing) state.getValue(FACING)));
+	}
+
+	@Override
+	protected BlockStateContainer createBlockState()
+	{
+		return new BlockStateContainer(this, new IProperty[] { FACING });
+	}
 }

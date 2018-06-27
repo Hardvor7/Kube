@@ -3,24 +3,24 @@
 	{
 		"facing=north": 
 		{
-			"model": "km:coldiron_furnace"
+			"model": "km:lit_coldiron_furnace"
 		},
 
 		"facing=east": 
 		{
-			"model": "km:coldiron_furnace",
+			"model": "km:lit_coldiron_furnace",
 			"y": 90
 		},
 
 		"facing=south": 
 		{
-			"model": "km:coldiron_furnace",
+			"model": "km:lit_coldiron_furnace",
 			"y": 180
 		},
 
 		"facing=west": 
 		{
-			"model": "km:coldiron_furnace",
+			"model": "km:lit_coldiron_furnace",
 			"y": 270
 		}
 	}

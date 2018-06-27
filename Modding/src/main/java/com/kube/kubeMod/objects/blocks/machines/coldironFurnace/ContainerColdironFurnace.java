@@ -107,7 +107,7 @@ public class ContainerColdironFurnace extends Container
 			ItemStack stack1 = slot.getStack();
 			stack = stack1.copy();
 
-			if (index == 3)
+			if (index == 2)
 			{
 				if (!this.mergeItemStack(stack1, 3, 39, true))
 				{

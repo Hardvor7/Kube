@@ -13,7 +13,7 @@ public class ColdIronBlock extends BlockBase
 		setHardness(5.0f);
 		setResistance(10.0f);
 		setHarvestLevel("pickaxe", 2);
-		setLightLevel(3.0f);
+		setLightLevel(0.0f);
 	}
 
 }
