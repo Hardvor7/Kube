@@ -21,7 +21,6 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.NonNullList;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
@@ -35,6 +34,9 @@ public class TileEntityColdironFurnace extends TileEntity implements IInventory,
 	private static final int[] SLOTS_BOTTOM = new int[] { 2, 1 };
 	private static final int[] SLOTS_SIDES = new int[] { 1 };
 
+	/*
+	 * Slot 0: Smelting Item Slot 1: Need to Smelt Item Slot 2: Output of the smelt
+	 */
 	private NonNullList<ItemStack> furnaceItemStacks = NonNullList.<ItemStack>withSize(3, ItemStack.EMPTY);
 	private String customName;
 
@@ -42,6 +44,8 @@ public class TileEntityColdironFurnace extends TileEntity implements IInventory,
 	private int currentBurnTime;
 	private int cookTime;
 	private int totalCookTime;
+	private int temperature;
+	private int temperatureIncreaseAmount;
 
 	@Override
 	public String getName()
@@ -63,8 +67,7 @@ public class TileEntityColdironFurnace extends TileEntity implements IInventory,
 	@Override
 	public ITextComponent getDisplayName()
 	{
-		return this.hasCustomName() ? new TextComponentString(this.getName())
-				: new TextComponentTranslation(this.getName());
+		return this.hasCustomName() ? new TextComponentString(this.getName()) : new TextComponentTranslation(this.getName());
 	}
 
 	@Override
@@ -108,8 +111,7 @@ public class TileEntityColdironFurnace extends TileEntity implements IInventory,
 	public void setInventorySlotContents(int index, ItemStack stack)
 	{
 		ItemStack itemstack = (ItemStack) this.furnaceItemStacks.get(index);
-		boolean flag = !stack.isEmpty() && stack.isItemEqual(itemstack)
-				&& ItemStack.areItemStackTagsEqual(stack, itemstack);
+		boolean flag = !stack.isEmpty() && stack.isItemEqual(itemstack) && ItemStack.areItemStackTagsEqual(stack, itemstack);
 		this.furnaceItemStacks.set(index, stack);
 
 		if (stack.getCount() > this.getInventoryStackLimit())
@@ -134,7 +136,9 @@ public class TileEntityColdironFurnace extends TileEntity implements IInventory,
 		this.burnTime = compound.getInteger("BurnTime");
 		this.cookTime = compound.getInteger("CookTime");
 		this.totalCookTime = compound.getInteger("CookTimeTotal");
-		this.currentBurnTime = getItemBurnTime((ItemStack) this.furnaceItemStacks.get(1));
+		this.currentBurnTime = (getItemBurnTime((ItemStack) this.furnaceItemStacks.get(1)))[0];
+		this.temperature = compound.getInteger("Temperature");
+		this.temperatureIncreaseAmount = (getItemBurnTime((ItemStack) this.furnaceItemStacks.get(1)))[1];
 
 		if (compound.hasKey("CustomName", 8))
 		{
@@ -149,6 +153,7 @@ public class TileEntityColdironFurnace extends TileEntity implements IInventory,
 		compound.setInteger("BurnTime", (short) this.burnTime);
 		compound.setInteger("CookTime", (short) this.cookTime);
 		compound.setInteger("CookTimeTotal", (short) this.totalCookTime);
+		compound.setFloat("Temperature", this.temperature);
 		ItemStackHelper.saveAllItems(compound, this.furnaceItemStacks);
 
 		if (this.hasCustomName())
@@ -179,61 +184,69 @@ public class TileEntityColdironFurnace extends TileEntity implements IInventory,
 		boolean flag1 = false;
 
 		if (this.isBurning())
-			--this.burnTime;
+		{
+			this.burnTime--;
+			this.temperature += (int) Math.round((double) BlockColdironFurnace.REAL_TEMPERATURE_RATIO * (double) temperatureIncreaseAmount / (double) this.currentBurnTime);
+		}
+		else
+		{
+			temperatureIncreaseAmount = 0;
+		}
 
 		if (!this.world.isRemote)
 		{
 			ItemStack stack = (ItemStack) this.furnaceItemStacks.get(1);
 
-			if (this.isBurning() || !stack.isEmpty() && !((ItemStack) this.furnaceItemStacks.get(0)).isEmpty())
+			if (this.isBurning() || !stack.isEmpty())
 			{
-				if (!this.isBurning() && this.canSmelt())
+				if (!this.isBurning())
 				{
-					this.burnTime = getItemBurnTime(stack);
+					int[] burnTimeAndAmount = getItemBurnTime(stack);
+					this.burnTime = (int) burnTimeAndAmount[0];
+					this.temperatureIncreaseAmount = burnTimeAndAmount[1];
 					this.currentBurnTime = this.burnTime;
 
-					if (this.isBurning())
+					flag1 = true;
+
+					if (!stack.isEmpty())
 					{
-						flag1 = true;
+						Item item = stack.getItem();
+						stack.shrink(1);
 
-						if (!stack.isEmpty())
+						if (stack.isEmpty())
 						{
-							Item item = stack.getItem();
-							stack.shrink(1);
-
-							if (stack.isEmpty())
-							{
-								ItemStack item1 = item.getContainerItem(stack);
-								this.furnaceItemStacks.set(1, item1);
-							}
+							ItemStack item1 = item.getContainerItem(stack);
+							this.furnaceItemStacks.set(1, item1);
 						}
 					}
 				}
-				if (this.isBurning() && this.canSmelt())
-				{
-					++this.cookTime;
-
-					if (this.cookTime == this.totalCookTime)
-					{
-						this.cookTime = 0;
-						this.totalCookTime = this.getCookTime((ItemStack) this.furnaceItemStacks.get(0));
-						this.smeltItem();
-						flag1 = true;
-					}
-				}
-				else
-					this.cookTime = 0;
-			}
-			else if (!this.isBurning() && this.cookTime > 0)
-			{
-				this.cookTime = MathHelper.clamp(this.cookTime - 2, 0, this.totalCookTime);
 			}
 			if (flag != this.isBurning())
 			{
 				flag1 = true;
 				BlockColdironFurnace.setState(this.isBurning(), this.world, this.pos);
 			}
+
+			if (this.canSmelt())
+			{
+				++this.cookTime;
+				Math.max(0, this.temperature - BlockColdironFurnace.REAL_TEMPERATURE_RATIO);
+
+				if (this.cookTime == this.totalCookTime)
+				{
+					this.cookTime = 0;
+					this.totalCookTime = this.getCookTime((ItemStack) this.furnaceItemStacks.get(0));
+					this.smeltItem();
+					flag1 = true;
+				}
+			}
+			else
+			{
+				this.cookTime = 0;
+			}
+
 		}
+
 		if (flag1)
 			this.markDirty();
 	}
@@ -245,14 +258,14 @@ public class TileEntityColdironFurnace extends TileEntity implements IInventory,
 
 	private boolean canSmelt()
 	{
-		if (((ItemStack) this.furnaceItemStacks.get(0)).isEmpty())
+		if (((ItemStack) this.furnaceItemStacks.get(0)).isEmpty() || this.temperature <= 0)
 		{
 			return false;
 		}
 		else
 		{
-			ItemStack result = ColdironFurnaceRecipes.getInstance()
-					.getColdironSmeltingResult((ItemStack) this.furnaceItemStacks.get(0));
+			ItemStack result = ColdironFurnaceRecipes.getInstance().getColdironSmeltingResult((ItemStack) this.furnaceItemStacks.get(0),
+					BlockColdironFurnace.getRealTemperature(temperature));
 
 			if (result.isEmpty())
 			{
@@ -282,7 +295,7 @@ public class TileEntityColdironFurnace extends TileEntity implements IInventory,
 		if (this.canSmelt())
 		{
 			ItemStack input = (ItemStack) this.furnaceItemStacks.get(0);
-			ItemStack result = ColdironFurnaceRecipes.getInstance().getColdironSmeltingResult(input);
+			ItemStack result = ColdironFurnaceRecipes.getInstance().getColdironSmeltingResult(input, BlockColdironFurnace.getRealTemperature(temperature));
 			ItemStack output = (ItemStack) this.furnaceItemStacks.get(2);
 
 			if (output.isEmpty())
@@ -302,115 +315,114 @@ public class TileEntityColdironFurnace extends TileEntity implements IInventory,
 	 * Returns the number of ticks that the supplied fuel item will keep the furnace
 	 * burning, or 0 if the item isn't fuel
 	 */
-	public static int getItemBurnTime(ItemStack stack)
+	public static int[] getItemBurnTime(ItemStack stack)
 	{
 		if (stack.isEmpty())
 		{
-			return 0;
+			return new int[] { 0, 0 };
 		}
 		else
 		{
 			int burnTime = net.minecraftforge.event.ForgeEventFactory.getItemBurnTime(stack);
 			if (burnTime >= 0)
-				return burnTime;
+				return new int[] { burnTime, 10 };
 			Item item = stack.getItem();
 
 			if (item == Item.getItemFromBlock(Blocks.WOODEN_SLAB))
 			{
-				return 150;
+				return new int[] { 1, 1 };
 			}
 			else if (item == Item.getItemFromBlock(Blocks.WOOL))
 			{
-				return 100;
+				return new int[] { 1, 1 };
 			}
 			else if (item == Item.getItemFromBlock(Blocks.CARPET))
 			{
-				return 67;
+				return new int[] { 1, 1 };
 			}
 			else if (item == Item.getItemFromBlock(Blocks.LADDER))
 			{
-				return 300;
+				return new int[] { 1, 1 };
 			}
 			else if (item == Item.getItemFromBlock(Blocks.WOODEN_BUTTON))
 			{
-				return 100;
+				return new int[] { 1, 1 };
 			}
 			else if (Block.getBlockFromItem(item).getDefaultState().getMaterial() == Material.WOOD)
 			{
-				return 300;
+				return new int[] { 1, 1 };
 			}
 			else if (item == Item.getItemFromBlock(Blocks.COAL_BLOCK))
 			{
-				return 16000;
+				return new int[] { 1200, 270 };
 			}
 			else if (item instanceof ItemTool && "WOOD".equals(((ItemTool) item).getToolMaterialName()))
 			{
-				return 200;
+				return new int[] { 1, 1 };
 			}
 			else if (item instanceof ItemSword && "WOOD".equals(((ItemSword) item).getToolMaterialName()))
 			{
-				return 200;
+				return new int[] { 1, 1 };
 			}
 			else if (item instanceof ItemHoe && "WOOD".equals(((ItemHoe) item).getMaterialName()))
 			{
-				return 200;
+				return new int[] { 1, 1 };
 			}
 			else if (item == Items.STICK)
 			{
-				return 100;
+				return new int[] { 1, 1 };
 			}
 			else if (item != Items.BOW && item != Items.FISHING_ROD)
 			{
 				if (item == Items.SIGN)
 				{
-					return 200;
+					return new int[] { 1, 1 };
 				}
 				else if (item == Items.COAL)
 				{
-					return 1600;
+					return new int[] { 160, 90 };
 				}
 				else if (item == Items.LAVA_BUCKET)
 				{
-					return 20000;
+					return new int[] { 3000, 1000 };
 				}
 				else if (item != Item.getItemFromBlock(Blocks.SAPLING) && item != Items.BOWL)
 				{
 					if (item == Items.BLAZE_ROD)
 					{
-						return 2400;
+						return new int[] { 300, 200 };
 					}
 					else if (item instanceof ItemDoor && item != Items.IRON_DOOR)
 					{
-						return 200;
+						return new int[] { 1, 1 };
 					}
 					else
 					{
-						return item instanceof ItemBoat ? 400 : 0;
+						return item instanceof ItemBoat ? new int[] { 1, 1 } : new int[] { 0, 0 };
 					}
 				}
 				else
 				{
-					return 100;
+					return new int[] { 1, 1 };
 				}
 			}
 			else
 			{
-				return 300;
+				return new int[] { 1, 1 };
 			}
 		}
 	}
 
 	public static boolean isItemFuel(ItemStack fuel)
 	{
-		return getItemBurnTime(fuel) > 0;
+		return getItemBurnTime(fuel)[0] > 0;
 	}
 
 	@Override
 	public boolean isUsableByPlayer(EntityPlayer player)
 	{
 		return this.world.getTileEntity(this.pos) != this ? false
-				: player.getDistanceSq((double) this.pos.getX() + 0.5D, (double) this.pos.getY() + 0.5D,
-						(double) this.pos.getZ() + 0.5D) <= 64.0D;
+				: player.getDistanceSq((double) this.pos.getX() + 0.5D, (double) this.pos.getY() + 0.5D, (double) this.pos.getZ() + 0.5D) <= 64.0D;
 	}
 
 	@Override
@@ -500,6 +512,10 @@ public class TileEntityColdironFurnace extends TileEntity implements IInventory,
 			return this.cookTime;
 		case 3:
 			return this.totalCookTime;
+		case 4:
+			return this.temperature;
+		case 5:
+			return this.temperatureIncreaseAmount;
 		default:
 			return 0;
 		}
@@ -521,13 +537,20 @@ public class TileEntityColdironFurnace extends TileEntity implements IInventory,
 			break;
 		case 3:
 			this.totalCookTime = value;
+			break;
+		case 4:
+			this.temperature = value;
+			break;
+		case 5:
+			this.temperatureIncreaseAmount = value;
+			break;
 		}
 	}
 
 	@Override
 	public int getFieldCount()
 	{
-		return 4;
+		return 6;
 	}
 
 	@Override

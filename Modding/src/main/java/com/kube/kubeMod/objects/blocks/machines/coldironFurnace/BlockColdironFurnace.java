@@ -12,19 +12,16 @@ import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
-import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.properties.PropertyDirection;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityFurnace;
 import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
@@ -39,6 +36,12 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class BlockColdironFurnace extends BlockBase implements ITileEntityProvider
 {
+	public static final int MAX_TEMPERATURE = 5000;
+	public static final int REAL_TEMPERATURE_RATIO = 10000;
+	public static int getRealTemperature(float temperature)
+	{
+		return  (int)Math.round((double)temperature / REAL_TEMPERATURE_RATIO);
+	}
 
 	public static final PropertyDirection FACING = BlockHorizontal.FACING;
 	private final boolean isBurning;
@@ -71,13 +74,12 @@ public class BlockColdironFurnace extends BlockBase implements ITileEntityProvid
 	}
 
 	@Override
-	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn,
-			EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ)
+	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing,
+			float hitX, float hitY, float hitZ)
 	{
 		if (!worldIn.isRemote)
 		{
-			playerIn.openGui(Main.instance, Reference.GUI_COLDIRON_FURNACE, worldIn, pos.getX(), pos.getY(),
-					pos.getZ());
+			playerIn.openGui(Main.instance, Reference.GUI_COLDIRON_FURNACE, worldIn, pos.getX(), pos.getY(), pos.getZ());
 		}
 
 		return true;
@@ -124,13 +126,14 @@ public class BlockColdironFurnace extends BlockBase implements ITileEntityProvid
 			double d0 = (double) pos.getX() + 0.5D;
 			double d1 = (double) pos.getY() + rand.nextDouble() * 6.0D / 16.0D;
 			double d2 = (double) pos.getZ() + 0.5D;
+			@SuppressWarnings("unused")
 			double d3 = 0.52D;
 			double d4 = rand.nextDouble() * 0.6D - 0.3D;
 
 			if (rand.nextDouble() < 0.1D)
 			{
-				worldIn.playSound((double) pos.getX() + 0.5D, (double) pos.getY(), (double) pos.getZ() + 0.5D,
-						SoundEvents.BLOCK_FURNACE_FIRE_CRACKLE, SoundCategory.BLOCKS, 1.0F, 1.0F, false);
+				worldIn.playSound((double) pos.getX() + 0.5D, (double) pos.getY(), (double) pos.getZ() + 0.5D, SoundEvents.BLOCK_FURNACE_FIRE_CRACKLE,
+						SoundCategory.BLOCKS, 1.0F, 1.0F, false);
 			}
 
 			switch (enumfacing)
@@ -162,17 +165,13 @@ public class BlockColdironFurnace extends BlockBase implements ITileEntityProvid
 
 		if (active)
 		{
-			worldIn.setBlockState(pos,
-					BlockInit.LIT_COLDIRON_FURNACE.getDefaultState().withProperty(FACING, state.getValue(FACING)), 3);
-			worldIn.setBlockState(pos,
-					BlockInit.LIT_COLDIRON_FURNACE.getDefaultState().withProperty(FACING, state.getValue(FACING)), 3);
+			worldIn.setBlockState(pos, BlockInit.LIT_COLDIRON_FURNACE.getDefaultState().withProperty(FACING, state.getValue(FACING)), 3);
+			worldIn.setBlockState(pos, BlockInit.LIT_COLDIRON_FURNACE.getDefaultState().withProperty(FACING, state.getValue(FACING)), 3);
 		}
 		else
 		{
-			worldIn.setBlockState(pos,
-					BlockInit.COLDIRON_FURNACE.getDefaultState().withProperty(FACING, state.getValue(FACING)), 3);
-			worldIn.setBlockState(pos,
-					BlockInit.COLDIRON_FURNACE.getDefaultState().withProperty(FACING, state.getValue(FACING)), 3);
+			worldIn.setBlockState(pos, BlockInit.COLDIRON_FURNACE.getDefaultState().withProperty(FACING, state.getValue(FACING)), 3);
+			worldIn.setBlockState(pos, BlockInit.COLDIRON_FURNACE.getDefaultState().withProperty(FACING, state.getValue(FACING)), 3);
 		}
 
 		keepInventory = false;
@@ -191,44 +190,42 @@ public class BlockColdironFurnace extends BlockBase implements ITileEntityProvid
 	}
 
 	@Override
-	public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY,
-			float hitZ, int meta, EntityLivingBase placer, EnumHand hand)
+	public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta,
+			EntityLivingBase placer, EnumHand hand)
 	{
 		return this.getDefaultState().withProperty(FACING, placer.getHorizontalFacing().getOpposite());
 	}
 
 	@Override
-	public void onBlockPlacedBy(World worldIn, BlockPos pos, IBlockState state, EntityLivingBase placer,
-			ItemStack stack)
+	public void onBlockPlacedBy(World worldIn, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack)
 	{
-		worldIn.setBlockState(pos,
-				this.getDefaultState().withProperty(FACING, placer.getHorizontalFacing().getOpposite()), 2);
+		worldIn.setBlockState(pos, this.getDefaultState().withProperty(FACING, placer.getHorizontalFacing().getOpposite()), 2);
 
-        if (stack.hasDisplayName())
-        {
-            TileEntity tileentity = worldIn.getTileEntity(pos);
+		if (stack.hasDisplayName())
+		{
+			TileEntity tileentity = worldIn.getTileEntity(pos);
 
-            if (tileentity instanceof TileEntityColdironFurnace)
-            {
-                ((TileEntityColdironFurnace)tileentity).setCustomInventoryName(stack.getDisplayName());
-            }
-        }
+			if (tileentity instanceof TileEntityColdironFurnace)
+			{
+				((TileEntityColdironFurnace) tileentity).setCustomInventoryName(stack.getDisplayName());
+			}
+		}
 	}
 
 	@Override
 	public void breakBlock(World worldIn, BlockPos pos, IBlockState state)
 	{
-        if (!keepInventory)
-        {
-            TileEntity tileentity = worldIn.getTileEntity(pos);
+		if (!keepInventory)
+		{
+			TileEntity tileentity = worldIn.getTileEntity(pos);
 
-            if (tileentity instanceof TileEntityColdironFurnace)
-            {
-                InventoryHelper.dropInventoryItems(worldIn, pos, (TileEntityColdironFurnace)tileentity);
-            }
-        }
+			if (tileentity instanceof TileEntityColdironFurnace)
+			{
+				InventoryHelper.dropInventoryItems(worldIn, pos, (TileEntityColdironFurnace) tileentity);
+			}
+		}
 
-        super.breakBlock(worldIn, pos, state);
+		super.breakBlock(worldIn, pos, state);
 	}
 
 	/**

@@ -12,6 +12,7 @@ container.coldiron_furnace=Cold Iron Furnace
 
 // Items
 item.ingot_coldiron.name=Cold Iron Ingot
+item.ingot_dirty.name=Dirty Ingot
 
 // Tools
 item.axe_coldiron.name=Cold Iron Axe

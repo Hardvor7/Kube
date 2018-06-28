@@ -13,18 +13,20 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class ContainerColdironFurnace extends Container
 {
-	private final TileEntityColdironFurnace tileentity;
+	private final TileEntityColdironFurnace tileEntity;
 	private int cookTime;
 	private int totalCookTime;
 	private int furnaceBurnTime;
 	private int currentItemBurnTime;
+	private int temperature;
+	private int temperatureIncreaseAmount;
 
-	public ContainerColdironFurnace(InventoryPlayer playerInventory, TileEntityColdironFurnace tileentity)
+	public ContainerColdironFurnace(InventoryPlayer playerInventory, TileEntityColdironFurnace tileEntity)
 	{
-		this.tileentity = tileentity;
-		this.addSlotToContainer(new Slot(tileentity, 0, 56, 17));
-		this.addSlotToContainer(new SlotFurnaceFuel(tileentity, 1, 56, 53));
-		this.addSlotToContainer(new SlotFurnaceOutput(playerInventory.player, tileentity, 2, 116, 35));
+		this.tileEntity = tileEntity;
+		this.addSlotToContainer(new Slot(tileEntity, 0, 58, 35));
+		this.addSlotToContainer(new SlotFurnaceFuel(tileEntity, 1, 15, 35));
+		this.addSlotToContainer(new SlotFurnaceOutput(playerInventory.player, tileEntity, 2, 116, 35));
 
 		for (int i = 0; i < 3; ++i)
 		{
@@ -44,7 +46,7 @@ public class ContainerColdironFurnace extends Container
 	public void addListener(IContainerListener listener)
 	{
 		super.addListener(listener);
-		listener.sendAllWindowProperties(this, this.tileentity);
+		listener.sendAllWindowProperties(this, this.tileEntity);
 	}
 
 	@Override
@@ -56,44 +58,56 @@ public class ContainerColdironFurnace extends Container
 		{
 			IContainerListener icontainerlistener = this.listeners.get(i);
 
-			if (this.cookTime != this.tileentity.getField(2))
+			if (this.cookTime != this.tileEntity.getField(2))
 			{
-				icontainerlistener.sendWindowProperty(this, 2, this.tileentity.getField(2));
+				icontainerlistener.sendWindowProperty(this, 2, this.tileEntity.getField(2));
 			}
 
-			if (this.furnaceBurnTime != this.tileentity.getField(0))
+			if (this.furnaceBurnTime != this.tileEntity.getField(0))
 			{
-				icontainerlistener.sendWindowProperty(this, 0, this.tileentity.getField(0));
+				icontainerlistener.sendWindowProperty(this, 0, this.tileEntity.getField(0));
 			}
 
-			if (this.currentItemBurnTime != this.tileentity.getField(1))
+			if (this.currentItemBurnTime != this.tileEntity.getField(1))
 			{
-				icontainerlistener.sendWindowProperty(this, 1, this.tileentity.getField(1));
+				icontainerlistener.sendWindowProperty(this, 1, this.tileEntity.getField(1));
 			}
 
-			if (this.totalCookTime != this.tileentity.getField(3))
+			if (this.totalCookTime != this.tileEntity.getField(3))
 			{
-				icontainerlistener.sendWindowProperty(this, 3, this.tileentity.getField(3));
+				icontainerlistener.sendWindowProperty(this, 3, this.tileEntity.getField(3));
+			}
+
+			if (this.temperature != this.tileEntity.getField(4))
+			{
+				icontainerlistener.sendWindowProperty(this, 4, this.tileEntity.getField(4));
+			}
+
+			if (this.temperatureIncreaseAmount != this.tileEntity.getField(5))
+			{
+				icontainerlistener.sendWindowProperty(this, 5, this.tileEntity.getField(5));
 			}
 		}
 
-		this.cookTime = this.tileentity.getField(2);
-		this.furnaceBurnTime = this.tileentity.getField(0);
-		this.currentItemBurnTime = this.tileentity.getField(1);
-		this.totalCookTime = this.tileentity.getField(3);
+		this.cookTime = this.tileEntity.getField(2);
+		this.furnaceBurnTime = this.tileEntity.getField(0);
+		this.currentItemBurnTime = this.tileEntity.getField(1);
+		this.totalCookTime = this.tileEntity.getField(3);
+		this.temperature = this.tileEntity.getField(4);
+		this.temperatureIncreaseAmount = this.tileEntity.getField(5);
 	}
 
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void updateProgressBar(int id, int data)
 	{
-		this.tileentity.setField(id, data);
+		this.tileEntity.setField(id, data);
 	}
 
 	@Override
 	public boolean canInteractWith(EntityPlayer playerIn)
 	{
-		return this.tileentity.isUsableByPlayer(playerIn);
+		return this.tileEntity.isUsableByPlayer(playerIn);
 	}
 
 	@Override
@@ -118,7 +132,7 @@ public class ContainerColdironFurnace extends Container
 			}
 			else if (index != 1 && index != 0)
 			{
-				if (!ColdironFurnaceRecipes.getInstance().getColdironSmeltingResult(stack1).isEmpty())
+				if (!ColdironFurnaceRecipes.getInstance().getColdironSmeltingResult(stack1, this.temperature).isEmpty())
 				{
 					if (!this.mergeItemStack(stack1, 0, 1, false))
 					{

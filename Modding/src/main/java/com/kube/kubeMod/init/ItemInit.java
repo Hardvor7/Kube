@@ -31,6 +31,7 @@ public class ItemInit
 
 	// Items
 	public static final Item INGOT_COLDIRON = new ItemBase("ingot_coldiron");
+	public static final Item INGOT_DIRTY = new ItemBase("ingot_dirty");
 
 	// Tools
 	public static final Item AXE_INGOT = new ToolAxe("axe_coldiron", TOOL_COLDIRON, 8.0F, -3.1F);
