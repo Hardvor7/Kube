@@ -33,7 +33,11 @@ public class TileEntityColdironFurnace extends TileEntity implements IInventory,
 {
 	public static final int MAX_TEMPERATURE = 100000;
 	private static final int REAL_TEMPERATURE_RATIO = 10000;
-	public static int getRealTemperature(float temperature) { return (int) Math.round((double) temperature / REAL_TEMPERATURE_RATIO); }
+
+	public static int getRealTemperature(float temperature)
+	{
+		return (int) Math.round((double) temperature / REAL_TEMPERATURE_RATIO);
+	}
 
 	private static final int[] SLOTS_TOP = new int[] { 0 };
 	private static final int[] SLOTS_BOTTOM = new int[] { 2, 1 };
@@ -191,7 +195,8 @@ public class TileEntityColdironFurnace extends TileEntity implements IInventory,
 		if (this.isBurning())
 		{
 			this.burnTime--;
-			this.temperature += (int) Math.round((double) REAL_TEMPERATURE_RATIO * (double) temperatureIncreaseAmount / (double) this.currentBurnTime);
+			this.temperature = Math.min(getMaxTemperature(),
+					this.temperature + (int) Math.round((double) REAL_TEMPERATURE_RATIO * (double) temperatureIncreaseAmount / (double) this.currentBurnTime));
 		}
 		else
 		{
@@ -204,7 +209,7 @@ public class TileEntityColdironFurnace extends TileEntity implements IInventory,
 
 			if (this.isBurning() || !stack.isEmpty())
 			{
-				if (!this.isBurning())
+				if (!this.isBurning() && this.temperature < getMaxTemperature())
 				{
 					int[] burnTimeAndAmount = getItemBurnTime(stack);
 					this.burnTime = (int) burnTimeAndAmount[0];
@@ -262,6 +267,11 @@ public class TileEntityColdironFurnace extends TileEntity implements IInventory,
 	}
 
 	public int getMaxTemperature()
+	{
+		return getRealMaxTemperature() * REAL_TEMPERATURE_RATIO;
+	}
+	
+	public int getRealMaxTemperature()
 	{
 		return 5000;
 	}
@@ -331,15 +341,14 @@ public class TileEntityColdironFurnace extends TileEntity implements IInventory,
 	 */
 	public static int[] getItemBurnTime(ItemStack stack)
 	{
-		if (stack.isEmpty())
-		{
-			return new int[] { 0, 0 };
-		}
-		else
+		if (!stack.isEmpty())
 		{
 			int burnTime = net.minecraftforge.event.ForgeEventFactory.getItemBurnTime(stack);
 			if (burnTime >= 0)
+			{
 				return new int[] { burnTime, 10 };
+			}
+			
 			Item item = stack.getItem();
 
 			if (item == Item.getItemFromBlock(Blocks.WOODEN_SLAB))
@@ -386,53 +395,49 @@ public class TileEntityColdironFurnace extends TileEntity implements IInventory,
 			{
 				return new int[] { 1, 1 };
 			}
-			else if (item != Items.BOW && item != Items.FISHING_ROD)
+			else if (item == Items.BOW || item == Items.FISHING_ROD)
 			{
-				if (item == Items.SIGN)
-				{
-					return new int[] { 1, 1 };
-				}
-				else if (item == Items.COAL)
-				{
-					return new int[] { 160, 90 };
-				}
-				else if (item == Items.LAVA_BUCKET)
-				{
-					return new int[] { 3000, 1000 };
-				}
-				else if (item != Item.getItemFromBlock(Blocks.SAPLING) && item != Items.BOWL)
-				{
-					if (item == Items.BLAZE_ROD)
-					{
-						return new int[] { 300, 200 };
-					}
-					else if (item instanceof ItemDoor && item != Items.IRON_DOOR)
-					{
-						return new int[] { 1, 1 };
-					}
-					else
-					{
-						return item instanceof ItemBoat ? new int[] { 1, 1 } : new int[] { 0, 0 };
-					}
-				}
-				else
-				{
-					return new int[] { 1, 1 };
-				}
+				return new int[] { 1, 1 };
 			}
-			else if (item == Item.getItemFromBlock(BlockInit.COLDIRON_FURNACE))
+			else if (item == Items.SIGN)
 			{
-				return new int[] { 1, 50 };
+				return new int[] { 1, 1 };
+			}
+			else if (item == Items.COAL)
+			{
+				return new int[] { 160, 90 };
+			}
+			else if (item == Items.LAVA_BUCKET)
+			{
+				return new int[] { 3000, 1000 };
+			}
+			else if (item == Item.getItemFromBlock(Blocks.SAPLING) || item == Items.BOWL)
+			{
+				return new int[] { 1, 1 };
+			}
+			else if (item == Items.BLAZE_ROD)
+			{
+				return new int[] { 300, 200 };
+			}
+			else if (item instanceof ItemDoor && item != Items.IRON_DOOR)
+			{
+				return new int[] { 1, 1 };
+			}
+			else if (item instanceof ItemBoat)
+			{
+				return new int[] { 1, 1 };
 			}
 			else if (item == ItemInit.INGOT_COLDIRON)
 			{
 				return new int[] { 1, 10 };
 			}
-			else
+			else if (item == Item.getItemFromBlock(BlockInit.BLOCK_COLDIRON))
 			{
-				return new int[] { 1, 1 };
+				return new int[] { 1, 50 };
 			}
 		}
+		
+		return new int[] { 0, 0 };
 	}
 
 	public static boolean isItemFuel(ItemStack fuel)

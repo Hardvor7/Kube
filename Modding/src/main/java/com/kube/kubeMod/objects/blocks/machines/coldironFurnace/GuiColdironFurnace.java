@@ -63,7 +63,7 @@ public class GuiColdironFurnace extends GuiContainer
 		int i = TileEntityColdironFurnace.getRealTemperature(tileEntity.getField(4));
 		if (i == 0)
 			return 0;
-		return pixels * i / tileEntity.getMaxTemperature();
+		return pixels * i / tileEntity.getRealMaxTemperature();
 	}
 
 	private int getCookProgressScaled(int pixels)

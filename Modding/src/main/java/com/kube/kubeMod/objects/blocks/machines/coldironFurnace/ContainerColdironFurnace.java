@@ -1,12 +1,13 @@
 package com.kube.kubeMod.objects.blocks.machines.coldironFurnace;
 
+import com.kube.kubeMod.objects.blocks.machines.coldironFurnace.slots.SlotColdironFurnaceFuel;
+import com.kube.kubeMod.objects.blocks.machines.coldironFurnace.slots.SlotColdironFurnaceOutput;
+
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IContainerListener;
 import net.minecraft.inventory.Slot;
-import net.minecraft.inventory.SlotFurnaceFuel;
-import net.minecraft.inventory.SlotFurnaceOutput;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -25,8 +26,8 @@ public class ContainerColdironFurnace extends Container
 	{
 		this.tileEntity = tileEntity;
 		this.addSlotToContainer(new Slot(tileEntity, 0, 58, 35));
-		this.addSlotToContainer(new SlotFurnaceFuel(tileEntity, 1, 15, 35));
-		this.addSlotToContainer(new SlotFurnaceOutput(playerInventory.player, tileEntity, 2, 116, 35));
+		this.addSlotToContainer(new SlotColdironFurnaceFuel(tileEntity, 1, 15, 35));
+		this.addSlotToContainer(new SlotColdironFurnaceOutput(playerInventory.player, tileEntity, 2, 116, 35));
 
 		for (int i = 0; i < 3; ++i)
 		{

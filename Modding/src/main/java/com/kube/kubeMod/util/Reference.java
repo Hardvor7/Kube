@@ -10,4 +10,5 @@ public class Reference
 	public static final String COMMON_PROXY_CLASS = "com.kube.kubeMod.proxy.CommonProxy";
 	
 	public static final int GUI_COLDIRON_FURNACE = 0;
+	
 }
