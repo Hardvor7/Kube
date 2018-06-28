@@ -36,13 +36,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class BlockColdironFurnace extends BlockBase implements ITileEntityProvider
 {
-	public static final int MAX_TEMPERATURE = 5000;
-	public static final int REAL_TEMPERATURE_RATIO = 10000;
-	public static int getRealTemperature(float temperature)
-	{
-		return  (int)Math.round((double)temperature / REAL_TEMPERATURE_RATIO);
-	}
-
 	public static final PropertyDirection FACING = BlockHorizontal.FACING;
 	private final boolean isBurning;
 	private static boolean keepInventory;

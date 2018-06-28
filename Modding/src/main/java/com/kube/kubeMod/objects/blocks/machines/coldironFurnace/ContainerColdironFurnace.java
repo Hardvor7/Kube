@@ -132,7 +132,7 @@ public class ContainerColdironFurnace extends Container
 			}
 			else if (index != 1 && index != 0)
 			{
-				if (!ColdironFurnaceRecipes.getInstance().getColdironSmeltingResult(stack1, this.temperature).isEmpty())
+				if (ColdironFurnaceRecipes.getInstance().isInSmeltingList(stack1, 0, TileEntityColdironFurnace.MAX_TEMPERATURE))
 				{
 					if (!this.mergeItemStack(stack1, 0, 1, false))
 					{

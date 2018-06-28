@@ -39,7 +39,7 @@ public class GuiColdironFurnace extends GuiContainer
 		String tileName = this.tileEntity.getDisplayName().getUnformattedText();
 		this.fontRenderer.drawString(tileName, this.xSize / 2 - this.fontRenderer.getStringWidth(tileName) / 2, 6, 4210752);
 		this.fontRenderer.drawString(this.playerInventory.getDisplayName().getUnformattedText(), 8, this.ySize - 96 + 2, 4210752);
-		this.fontRenderer.drawString("T°" + BlockColdironFurnace.getRealTemperature(tileEntity.getField(4)), 49, 19, 4210752);
+		this.fontRenderer.drawString("T°" + TileEntityColdironFurnace.getRealTemperature(tileEntity.getField(4)), 49, 19, 4210752);
 	}
 
 	@Override
@@ -60,10 +60,10 @@ public class GuiColdironFurnace extends GuiContainer
 
 	private int getTemperatureScaled(int pixels)
 	{
-		int i = BlockColdironFurnace.getRealTemperature(tileEntity.getField(4));
+		int i = TileEntityColdironFurnace.getRealTemperature(tileEntity.getField(4));
 		if (i == 0)
 			return 0;
-		return pixels * i / BlockColdironFurnace.MAX_TEMPERATURE;
+		return pixels * i / tileEntity.getMaxTemperature();
 	}
 
 	private int getCookProgressScaled(int pixels)

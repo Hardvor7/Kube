@@ -1,5 +1,7 @@
 package com.kube.kubeMod.objects.blocks.machines.coldironFurnace;
 
+import com.kube.kubeMod.init.BlockInit;
+import com.kube.kubeMod.init.ItemInit;
 import com.kube.kubeMod.objects.blocks.machines.coldironFurnace.slots.SlotColdironFurnaceFuel;
 
 import net.minecraft.block.Block;
@@ -29,7 +31,10 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class TileEntityColdironFurnace extends TileEntity implements IInventory, ITickable
 {
-	private static final int COLDIRON_FURNACE_COOK_TIME = 50;
+	public static final int MAX_TEMPERATURE = 100000;
+	private static final int REAL_TEMPERATURE_RATIO = 10000;
+	public static int getRealTemperature(float temperature) { return (int) Math.round((double) temperature / REAL_TEMPERATURE_RATIO); }
+
 	private static final int[] SLOTS_TOP = new int[] { 0 };
 	private static final int[] SLOTS_BOTTOM = new int[] { 2, 1 };
 	private static final int[] SLOTS_SIDES = new int[] { 1 };
@@ -153,7 +158,7 @@ public class TileEntityColdironFurnace extends TileEntity implements IInventory,
 		compound.setInteger("BurnTime", (short) this.burnTime);
 		compound.setInteger("CookTime", (short) this.cookTime);
 		compound.setInteger("CookTimeTotal", (short) this.totalCookTime);
-		compound.setFloat("Temperature", this.temperature);
+		compound.setInteger("Temperature", this.temperature);
 		ItemStackHelper.saveAllItems(compound, this.furnaceItemStacks);
 
 		if (this.hasCustomName())
@@ -186,7 +191,7 @@ public class TileEntityColdironFurnace extends TileEntity implements IInventory,
 		if (this.isBurning())
 		{
 			this.burnTime--;
-			this.temperature += (int) Math.round((double) BlockColdironFurnace.REAL_TEMPERATURE_RATIO * (double) temperatureIncreaseAmount / (double) this.currentBurnTime);
+			this.temperature += (int) Math.round((double) REAL_TEMPERATURE_RATIO * (double) temperatureIncreaseAmount / (double) this.currentBurnTime);
 		}
 		else
 		{
@@ -230,7 +235,7 @@ public class TileEntityColdironFurnace extends TileEntity implements IInventory,
 			if (this.canSmelt())
 			{
 				++this.cookTime;
-				Math.max(0, this.temperature - BlockColdironFurnace.REAL_TEMPERATURE_RATIO);
+				this.temperature = Math.max(0, this.temperature - REAL_TEMPERATURE_RATIO);
 
 				if (this.cookTime == this.totalCookTime)
 				{
@@ -251,9 +256,19 @@ public class TileEntityColdironFurnace extends TileEntity implements IInventory,
 			this.markDirty();
 	}
 
-	public int getCookTime(ItemStack input)
+	public int getCookTime(ItemStack stack)
 	{
-		return COLDIRON_FURNACE_COOK_TIME;
+		return 50;
+	}
+
+	public int getMaxTemperature()
+	{
+		return 5000;
+	}
+
+	public int getRealTemperature()
+	{
+		return (int) Math.round((double) this.temperature / REAL_TEMPERATURE_RATIO);
 	}
 
 	private boolean canSmelt()
@@ -264,8 +279,7 @@ public class TileEntityColdironFurnace extends TileEntity implements IInventory,
 		}
 		else
 		{
-			ItemStack result = ColdironFurnaceRecipes.getInstance().getColdironSmeltingResult((ItemStack) this.furnaceItemStacks.get(0),
-					BlockColdironFurnace.getRealTemperature(temperature));
+			ItemStack result = ColdironFurnaceRecipes.getInstance().getColdironSmeltingResult((ItemStack) this.furnaceItemStacks.get(0), getRealTemperature(temperature));
 
 			if (result.isEmpty())
 			{
@@ -295,7 +309,7 @@ public class TileEntityColdironFurnace extends TileEntity implements IInventory,
 		if (this.canSmelt())
 		{
 			ItemStack input = (ItemStack) this.furnaceItemStacks.get(0);
-			ItemStack result = ColdironFurnaceRecipes.getInstance().getColdironSmeltingResult(input, BlockColdironFurnace.getRealTemperature(temperature));
+			ItemStack result = ColdironFurnaceRecipes.getInstance().getColdironSmeltingResult(input, getRealTemperature(temperature));
 			ItemStack output = (ItemStack) this.furnaceItemStacks.get(2);
 
 			if (output.isEmpty())
@@ -405,6 +419,14 @@ public class TileEntityColdironFurnace extends TileEntity implements IInventory,
 				{
 					return new int[] { 1, 1 };
 				}
+			}
+			else if (item == Item.getItemFromBlock(BlockInit.COLDIRON_FURNACE))
+			{
+				return new int[] { 1, 50 };
+			}
+			else if (item == ItemInit.INGOT_COLDIRON)
+			{
+				return new int[] { 1, 10 };
 			}
 			else
 			{

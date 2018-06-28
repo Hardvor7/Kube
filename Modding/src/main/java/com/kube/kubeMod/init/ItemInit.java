@@ -34,16 +34,16 @@ public class ItemInit
 	public static final Item INGOT_DIRTY = new ItemBase("ingot_dirty");
 
 	// Tools
-	public static final Item AXE_INGOT = new ToolAxe("axe_coldiron", TOOL_COLDIRON, 8.0F, -3.1F);
-	public static final Item HOE_INGOT = new ToolHoe("hoe_coldiron", TOOL_COLDIRON);
-	public static final Item PICKAXE_INGOT = new ToolPickaxe("pickaxe_coldiron", TOOL_COLDIRON);
-	public static final Item SHOVEL_INGOT = new ToolShovel("shovel_coldiron", TOOL_COLDIRON);
-	public static final Item SWORD_INGOT = new ToolSword("sword_coldiron", TOOL_COLDIRON);
+	public static final Item AXE_COLDIRON = new ToolAxe("axe_coldiron", TOOL_COLDIRON, 8.0F, -3.1F);
+	public static final Item HOE_COLDIRON = new ToolHoe("hoe_coldiron", TOOL_COLDIRON);
+	public static final Item PICKAXE_COLDIRON = new ToolPickaxe("pickaxe_coldiron", TOOL_COLDIRON);
+	public static final Item SHOVEL_COLDIRON = new ToolShovel("shovel_coldiron", TOOL_COLDIRON);
+	public static final Item SWORD_COLDIRON = new ToolSword("sword_coldiron", TOOL_COLDIRON);
 
 	// Armors
-	public static final Item HELMET_INGOT = new ArmorBase("helmet_coldiron", ARMOR_COLDIRON, 1, EntityEquipmentSlot.HEAD);
-	public static final Item CHESTPLATE_INGOT = new ArmorBase("chestplate_coldiron", ARMOR_COLDIRON, 1, EntityEquipmentSlot.CHEST);
-	public static final Item LEGGINGS_INGOT = new ArmorBase("leggings_coldiron", ARMOR_COLDIRON, 2, EntityEquipmentSlot.LEGS);
-	public static final Item BOOTS_INGOT = new ArmorBase("boots_coldiron", ARMOR_COLDIRON, 1, EntityEquipmentSlot.FEET);
+	public static final Item HELMET_COLDIRON = new ArmorBase("helmet_coldiron", ARMOR_COLDIRON, 1, EntityEquipmentSlot.HEAD);
+	public static final Item CHESTPLATE_COLDIRON = new ArmorBase("chestplate_coldiron", ARMOR_COLDIRON, 1, EntityEquipmentSlot.CHEST);
+	public static final Item LEGGINGS_COLDIRON = new ArmorBase("leggings_coldiron", ARMOR_COLDIRON, 2, EntityEquipmentSlot.LEGS);
+	public static final Item BOOTS_COLDIRON = new ArmorBase("boots_coldiron", ARMOR_COLDIRON, 1, EntityEquipmentSlot.FEET);
 
 }

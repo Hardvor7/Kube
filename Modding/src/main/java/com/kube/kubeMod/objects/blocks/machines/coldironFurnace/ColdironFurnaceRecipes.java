@@ -9,6 +9,7 @@ import java.util.Map.Entry;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Table;
+import com.kube.kubeMod.init.BlockInit;
 import com.kube.kubeMod.init.ItemInit;
 
 import net.minecraft.block.Block;
@@ -31,18 +32,21 @@ public class ColdironFurnaceRecipes
 	private ColdironFurnaceRecipes()
 	{
 		addSmeltingRecipeForBlock(Blocks.IRON_ORE, 800, 1200, new ItemStack(ItemInit.INGOT_COLDIRON), 0.7F);
-		addSmeltingRecipeForBlock(Blocks.IRON_ORE, 1300, 1700, new ItemStack(Items.IRON_INGOT), 0.7F);
-		addSmeltingRecipeWithoutTemperature(Blocks.DIAMOND_ORE, new ItemStack(Items.DIAMOND, 2), 1.0F);
+		addSmeltingRecipeForBlock(Blocks.IRON_ORE, 1300, new ItemStack(Items.IRON_INGOT), 0.7F);
+		addSmeltingRecipeForBlock(BlockInit.BLOCK_COLDIRON, 2000, new ItemStack(ItemInit.INGOT_COLDIRON, 9), 1.0F);
+		addSmeltingRecipeForBlock(Blocks.DIAMOND_ORE, new ItemStack(Items.DIAMOND, 2), 1.0F);
 
 		generateDirtyIngotSmeltingRecipe();
 	}
 
-	/**
-	 * Adds a smelting recipe, where the input item is an instance of Block.
-	 */
-	public void addSmeltingRecipeWithoutTemperature(Block input, ItemStack stack, float experience)
+	public void addSmeltingRecipeForBlock(Block input, ItemStack stack, float experience)
 	{
-		this.addSmelting(Item.getItemFromBlock(input), 0, BlockColdironFurnace.MAX_TEMPERATURE, stack, experience);
+		this.addSmelting(Item.getItemFromBlock(input), 0, TileEntityColdironFurnace.MAX_TEMPERATURE, stack, experience);
+	}
+
+	public void addSmeltingRecipeForBlock(Block input, int tempMin, ItemStack stack, float experience)
+	{
+		this.addSmelting(Item.getItemFromBlock(input), tempMin, TileEntityColdironFurnace.MAX_TEMPERATURE, stack, experience);
 	}
 
 	/**
@@ -172,30 +176,24 @@ public class ColdironFurnaceRecipes
 			}
 
 			int lastTemperature = temperatures.get(temperatures.size() - 1);
-			if (lastTemperature < BlockColdironFurnace.MAX_TEMPERATURE)
+			if (lastTemperature < TileEntityColdironFurnace.MAX_TEMPERATURE)
 			{
-				this.addSmeltingRecipe(entry1.getKey(), lastTemperature + 1, BlockColdironFurnace.MAX_TEMPERATURE,
-						new ItemStack(ItemInit.INGOT_DIRTY), 0.0F);
+				this.addSmeltingRecipe(entry1.getKey(), lastTemperature + 1, TileEntityColdironFurnace.MAX_TEMPERATURE, new ItemStack(ItemInit.INGOT_DIRTY), 0.0F);
 			}
 		}
 
 		/*		Debug only
 		System.out.println("--------------------------------------------------------------------------------------------");
-		System.out.println("---------------------------------------SECOND-----------------------------------------------");
+		System.out.println("----------------------------------------TEST------------------------------------------------");
 		System.out.println("--------------------------------------------------------------------------------------------");
 		for (Entry<ItemStack, Map<Integer[], ItemStack>> entry1 : this.smeltingList.rowMap().entrySet())
 		{
 			System.out.println("New Entry");
-			List<Integer> temperatures = new ArrayList<>();
 			for (Entry<Integer[], ItemStack> entry2 : entry1.getValue().entrySet())
 			{
 				System.out.println(entry1.getKey().getItem().getUnlocalizedName() + " T° [" + entry2.getKey()[0] + "," + entry2.getKey()[1] + "] --> "
 						+ entry2.getValue().getItem().getUnlocalizedName());
-
-				temperatures.add(entry2.getKey()[0]);
-				temperatures.add(entry2.getKey()[1]);
 			}
-			Collections.sort(temperatures);
 		}
 		*/
 	}
