@@ -15,14 +15,12 @@ import fr.theshark34.openlauncherlib.util.explorer.Explorer;
 import fr.theshark34.supdate.BarAPI;
 import fr.theshark34.supdate.SUpdate;
 import fr.theshark34.supdate.application.integrated.FileDeleter;
-import fr.theshark34.swinger.Swinger;
-import fr.theshark34.swinger.colored.SColoredBar;
 
 public class KubeBootstrap
 {
 
 	private static SplashScreen splash;
-	private static SColoredBar progressBar;
+	private static CustomProgressBar progressBar;
 	private static Thread barUpdateThread;
 
 	private static final File K_B_DIR = new File(GameDirGenerator.createGameDir("Kube"), "Launcher");
@@ -41,12 +39,12 @@ public class KubeBootstrap
 			}
 		}
 		
-		Swinger.setResourcePath("/kube/bootstrap/resources/");
+		
 		showSplash();
 		
 		try
 		{
-			update();
+			Bootstrap.update();
 		}
 		catch (Exception e)
 		{
@@ -79,53 +77,5 @@ public class KubeBootstrap
 		splash.setVisible(true);
 	}
 
-	private static void update() throws Exception
-	{
-		SUpdate su = new SUpdate("http://" + serverAddress + "/KubeLauncher/bootstrap/", K_B_DIR);
-		su.getServerRequester().setRewriteEnabled(true);
-		su.addApplication(new FileDeleter());
-
-		barUpdateThread = new Thread()
-		{
-			@Override
-			public void run()
-			{
-				while (!this.isInterrupted())
-				{
-					progressBar.setValue((int) (BarAPI.getNumberOfTotalDownloadedBytes() / 1000));
-					progressBar.setMaximum((int) (BarAPI.getNumberOfTotalBytesToDownload() / 1000));
-				}
-			}
-		};
-		barUpdateThread.start();
-
-		su.start();
-		barUpdateThread.interrupt();
-
-	}
-
-	private static void launch() throws LaunchException
-	{
-		ClasspathConstructor constructor = new ClasspathConstructor();
-
-		ExploredDirectory gameDir = Explorer.dir(K_B_DIR);
-		constructor.add(gameDir.sub("launcher_lib").allRecursive().files().match(".*\\.((jar)$)*$"));
-		constructor.add(gameDir.get("launcher.jar"));
-
-		ExternalLaunchProfile profile = new ExternalLaunchProfile("kube.launcher.LauncherFrame",
-				constructor.make());
-		ExternalLauncher launcher = new ExternalLauncher(profile);
-
-		Process p = launcher.launch();
-		splash.setVisible(false);
-
-		try
-		{
-			p.waitFor();
-		}
-		catch (InterruptedException e)
-		{
-		}
-		System.exit(0);
-	}
+	
 }

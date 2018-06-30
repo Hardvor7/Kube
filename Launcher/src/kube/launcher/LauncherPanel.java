@@ -36,7 +36,7 @@ public class LauncherPanel extends JPanel implements SwingerEventListener
 	private JTextField passwordField = new JPasswordField();
 
 	private JLabel logoPan = new JLabel(new ImageIcon(
-			Swinger.getResource("Logo v1.0_noBack.png").getScaledInstance(1920 / 8, 600 / 8, Image.SCALE_DEFAULT)));
+			Swinger.getResource("KubeLogo.png").getScaledInstance(1920 / 8, 600 / 8, Image.SCALE_DEFAULT)));
 
 	private STexturedButton playButton = new STexturedButton(Swinger.getResource("PlayButton.png"));
 	private STexturedButton quitButton = new STexturedButton(Swinger.getResource("QuitButton.png"));
@@ -148,7 +148,7 @@ public class LauncherPanel extends JPanel implements SwingerEventListener
 						return;
 					}
 
-					saver.set("username", usernameField.getText());
+					//saver.set("username", usernameField.getText());
 
 					try
 					{
