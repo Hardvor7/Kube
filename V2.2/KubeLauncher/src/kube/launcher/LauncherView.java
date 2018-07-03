@@ -46,7 +46,7 @@ import javafx.scene.layout.BackgroundRepeat;
 public class LauncherView extends Application {
 	
 	
-	public static final String VERSION = "Alpha 2.3";
+	public static final String VERSION = "Alpha 2.2";
 	
 	public static final int WIDTH = 512;
 	public static final int HEIGHT = 256;
