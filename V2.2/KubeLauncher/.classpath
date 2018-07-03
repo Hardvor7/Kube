@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8">
+		<accessrules>
+			<accessrule kind="accessible" pattern="javafx/**"/>
+		</accessrules>
+	</classpathentry>
+	<classpathentry excluding="kube/resources/" kind="src" path="src"/>
+	<classpathentry kind="lib" path="src/kube/launcher/libraries/gson-2.6.2.jar"/>
+	<classpathentry kind="lib" path="src/kube/launcher/libraries/openauth-1.0.3-SNAPSHOT.jar"/>
+	<classpathentry kind="lib" path="src/kube/launcher/libraries/openlauncherlib-2.1-SNAPSHOT.jar"/>
+	<classpathentry kind="lib" path="src/kube/launcher/libraries/openlauncherlib-3.0.4.jar"/>
+	<classpathentry kind="lib" path="src/kube/launcher/libraries/s-update-3.1.0-BETA.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
