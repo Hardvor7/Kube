@@ -1,4 +1,4 @@
-package kube.launcher;
+package kube.utils;
 
 import javafx.scene.control.Alert;
 

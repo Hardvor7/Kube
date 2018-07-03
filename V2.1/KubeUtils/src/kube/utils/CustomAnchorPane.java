@@ -1,13 +1,16 @@
-package kube.bootstrap;
+package kube.utils;
 
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
 import javafx.scene.layout.BackgroundRepeat;
 public class CustomAnchorPane{
 
-	public AnchorPane pane;
+	private AnchorPane pane;
 	
 	
 	// ----- CONSTRUCTOR ----- //
@@ -23,6 +26,12 @@ public class CustomAnchorPane{
 		pane.setStyle("-fx-background-image:url(" + imageURL + ");");
 	}
 	
+	public AnchorPane getFXPane() 
+	{
+		return pane;
+	}
+	
+	
 	public void setBackgroundImage(String imageURL, BackgroundRepeat t, int tileSize)
 	{
 		pane.setStyle("-fx-background-image:url(" + imageURL + ");" 
@@ -35,6 +44,11 @@ public class CustomAnchorPane{
 	public void setBackgroundColor(double a, double r, double g, double b)
 	{
 		pane.setStyle("-fx-background-color:rgba(" + r + "," + g + "," + b + "," + a + ");");
+	}
+	
+	public void setBackgroundColor(Color color)
+	{
+		pane.setBackground(new Background(new BackgroundFill(color, null, null)));
 	}
 	
 	public void hide() {
@@ -93,6 +107,11 @@ public class CustomAnchorPane{
 			break;
 		
 		}
+	}
+	
+	public void setOpacity(double value)
+	{
+		pane.setOpacity(value);
 	}
 	
 	public enum AnchorType
