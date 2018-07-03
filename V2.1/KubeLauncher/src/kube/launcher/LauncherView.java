@@ -141,14 +141,18 @@ public class LauncherView extends Application {
 	public static void main(String[] args) { launch(args); }
     
     @Override
-    public void start(Stage primaryStage) {
+    public void start(Stage primaryStage) 
+    {
     	
     	// Properties
     	
-		try {
+		try 
+		{
 			prop = new Properties();
 			prop.load(new FileInputStream(new File("launcher.properties")));
-		} catch (Exception e) {
+		} 
+		catch (Exception e) 
+		{
 			e.printStackTrace();
 		}
     	
@@ -251,7 +255,8 @@ public class LauncherView extends Application {
 			quitLabel.setFillColor(Color.web("#A00000"));
 		});
 		
-		quitLabel.getFXLabel().setOnMouseClicked(e->{
+		quitLabel.getFXLabel().setOnMouseClicked(e->
+		{
 			
 			KeyFrame frames[] = {
 					new KeyFrame(Duration.millis(500), new KeyValue (primaryStage.getScene().getRoot().opacityProperty(), 0)),
@@ -272,12 +277,14 @@ public class LauncherView extends Application {
 		minimizeLabel = new CustomLabel("-", customFont, Color.web("#AAAAAA"), 460, 0); 
 		fadePane.getChildren().add(minimizeLabel.getFXLabel());
 		
-		minimizeLabel.getFXLabel().setOnMouseEntered(e->{
+		minimizeLabel.getFXLabel().setOnMouseEntered(e->
+		{
 			minimizeLabel.setCursor(Cursor.HAND);
 			minimizeLabel.setFillColor(Color.web("#DDDDDD"));
 		});
 		
-		minimizeLabel.getFXLabel().setOnMouseExited(e->{
+		minimizeLabel.getFXLabel().setOnMouseExited(e->
+		{
 			minimizeLabel.setCursor(Cursor.DEFAULT);
 			minimizeLabel.setFillColor(Color.web("#AAAAAA"));
 		});
@@ -349,7 +356,8 @@ public class LauncherView extends Application {
 					+ "-fx-cursor:normal;");
 		});
 		
-		playButton.getFXPane().addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>(){
+		playButton.getFXPane().addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>()
+		{
 			@Override
 			public void handle(MouseEvent event) 
 			{
@@ -523,18 +531,21 @@ public class LauncherView extends Application {
 		backLabel = new CustomLabel("<<", customFont, Color.web("#AAAAAA"), 10, HEIGHT - 40);
 		optionPane.getChildren().add(backLabel.getFXLabel());
 		
-		backLabel.getFXLabel().setOnMouseEntered(e->{
+		backLabel.getFXLabel().setOnMouseEntered(e->
+		{
 			backLabel.setFillColor(Color.WHITE);
 			backLabel.setCursor(Cursor.HAND);
 		});
 		
-		backLabel.getFXLabel().setOnMouseExited(e->{
+		backLabel.getFXLabel().setOnMouseExited(e->
+		{
 			backLabel.setFillColor(Color.web("#AAAAAA"));
 			backLabel.setCursor(Cursor.DEFAULT);
 		});
 		
 		
-		backLabel.getFXLabel().setOnMouseClicked(e->{
+		backLabel.getFXLabel().setOnMouseClicked(e->
+		{
 			Timeline timeline = new Timeline();
 			timeline.getKeyFrames().add(new KeyFrame(Duration.millis(250), new KeyValue (optionPane.getFXPane().opacityProperty(), 0)));
 			timeline.setOnFinished(ea->optionPane.hide());
