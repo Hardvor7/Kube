@@ -1,8 +1,6 @@
 package kube.launcher;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.PrintStream;
 import java.util.Arrays;
 
 import fr.theshark34.openauth.AuthPoints;
@@ -47,8 +45,8 @@ public class Launcher
 	private static LauncherView launcherView = null;
 	
 	
-	private static ByteArrayOutputStream baos;
-    private static PrintStream ps;
+	//private static ByteArrayOutputStream baos;
+    //private static PrintStream ps;
 	
 	public static Thread getUpdateThread() {
 		return updateThread;
@@ -61,8 +59,8 @@ public class Launcher
 	
 	public static void auth(String username, String password) throws AuthenticationException
 	{
-		baos = new ByteArrayOutputStream();
-		ps = new PrintStream(baos);
+		//baos = new ByteArrayOutputStream();
+		//ps = new PrintStream(baos);
 		//System.setOut(ps);
 		
 		Platform.runLater(()->launcherView.infoLabel.setText("Connexion à Minecraft.net..."));
