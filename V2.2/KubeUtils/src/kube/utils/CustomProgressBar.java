@@ -1,16 +1,16 @@
-package kube.bootstrap;
+package kube.utils;
 
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BackgroundRepeat;
 import javafx.scene.text.Font;
-import kube.bootstrap.CustomAnchorPane.AnchorType;
-import javafx.scene.control.Label;
+import kube.utils.CustomAnchorPane.AnchorType;
+
 public class CustomProgressBar {
 	
 	public float value;
 	private CustomAnchorPane box;
 	private AnchorPane progressBar;
-	private Label percentageLabel;
+	private javafx.scene.control.Label percentageLabel;
 	
 	
 	public CustomProgressBar(double width, double height, float margin, String stepURL, Font customFont, String backURL) 
@@ -23,22 +23,22 @@ public class CustomProgressBar {
 		box.setAnchor(AnchorType.Bottom, margin);
 		box.setBackgroundColor(0, 0, 0, .9);
 		box.setBackgroundImage(stepURL, BackgroundRepeat.REPEAT, (int)(height - 2 * margin));
-		box.pane.setPrefWidth(width - 2 * margin);
+		box.getFXPane().setPrefWidth(width - 2 * margin);
 		
 		
 		progressBar.setPrefSize(width, height);
 		progressBar.setStyle("-fx-background-image:url('" + backURL + "');");
-		progressBar.getChildren().add(box.pane);
+		progressBar.getChildren().add(box.getFXPane());
 		
 		
 		
 		// Progressbar Label
 		
-		percentageLabel = new Label("100%");
+		percentageLabel = new javafx.scene.control.Label("100%");
 		percentageLabel.setFont(customFont);
 		percentageLabel.setStyle("-fx-text-fill: #FFFFFF;");
-		percentageLabel.relocate(width/2 - 20, height - 17);
-		progressBar.getChildren().add(percentageLabel);
+		percentageLabel.relocate(width/2 - percentageLabel.getWidth() / 2, height - 17);
+		progressBar.getChildren().addAll(percentageLabel);
 		
 		
 		
@@ -53,8 +53,8 @@ public class CustomProgressBar {
 	public void setValue(float value)
 	{
 		this.value = value;
-		box.setAnchor(AnchorType.Right, box.pane.getPrefWidth() + 4 - (value* box.pane.getPrefWidth()));
-		//percentageLabel.setText((int)(value * 100) + "%");
+		box.setAnchor(AnchorType.Right, box.getFXPane().getPrefWidth() + 4 - (value* box.getFXPane().getPrefWidth()));
+		percentageLabel.setText((int)(value * 100) + "%");
 		
 	}
 	

@@ -3,15 +3,22 @@ package kube.launcher;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import javafx.util.Duration;
+import kube.utils.CustomAlert;
+import kube.utils.CustomAnchorPane;
+import kube.utils.CustomAnchorPane.AnchorType;
+import kube.utils.CustomLabel;
+import kube.utils.CustomProgressBar;
+
 import java.util.Properties;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import fr.theshark34.openauth.AuthenticationException;
 import fr.theshark34.openlauncherlib.LaunchException;
@@ -25,7 +32,8 @@ import javafx.collections.FXCollections;
 import javafx.event.EventHandler;
 import javafx.scene.Cursor;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert.AlertType;
+import kube.utils.CustomAlert.AlertType;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.Slider;
@@ -35,26 +43,23 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BackgroundRepeat;
 
-
-
 public class LauncherView extends Application {
+	
+	
+	public static final String VERSION = "Alpha 2.3";
 	
 	public static final int WIDTH = 512;
 	public static final int HEIGHT = 256;
 	
 	Properties prop = new Properties();
 	
-	public static LauncherView instance;
-	
 	public CustomProgressBar progressBar;
 	
 	public MediaPlayer audioPlayer;
 	
-	public javafx.scene.control.Label infoLabel;
+	public CustomLabel infoLabel;
 	
 	public Stage primaryStage;
-	
-	
 	
 	private CustomAnchorPane backPane;
 	private CustomAnchorPane videoPane;
@@ -65,77 +70,103 @@ public class LauncherView extends Application {
 	private TextField passField;
 	private CustomAnchorPane optionButton;
 	
-	private javafx.scene.control.Label passLabel;
-	private javafx.scene.control.Label nameLabel;
-	private javafx.scene.control.Label quitLabel;
-	private javafx.scene.control.Label minimizeLabel;
-	private javafx.scene.control.Label soundLabel;
+	private CustomLabel passLabel;
+	private CustomLabel nameLabel;
+	private CustomLabel quitLabel;
+	private CustomLabel minimizeLabel;
+	private CustomLabel soundLabel;
 	private CustomAnchorPane playButtonPane;
 	private CustomAnchorPane playButton;
-	private javafx.scene.control.Label playLabel;
+	private CustomLabel playLabel;
 	private CustomAnchorPane optionPane;
-	private javafx.scene.control.Label optionTitleLabel;
-	private javafx.scene.control.Label optionSoundLabel;
-	private javafx.scene.control.Label optionSoundLabelPercentage;
+	private CustomLabel optionTitleLabel;
+	private CustomLabel optionSoundLabel;
+	private CustomLabel optionSoundLabelPercentage;
 	private Slider soundSlider;
 	private ChoiceBox<String> ramChoice ;
-	private javafx.scene.control.Label ramChoiceLabel;
-	private javafx.scene.control.Label backLabel;
+	private CustomLabel ramChoiceLabel;
+	private CustomLabel backLabel;
+	private CustomLabel loadLabel;
+	private CustomAnchorPane loadfadePane;
+	private CustomAnchorPane loadPane;
+	private CustomLabel versionLabel;
 	
-	private Timer timer;
-	public TimerTask task;
-	public Slider getSoundSlider() {
+	private CheckBox localBox;
+	
+	private Media mediaHoverSound;
+	private MediaPlayer playerHoverSound;
+	
+	private Media mediaClickSound;
+	private MediaPlayer playerClickSound;
+	
+	
+	
+	public Slider getSoundSlider() 
+	{
 		return soundSlider;
 	}
 	
-	public String getRamChoice() {
+	public String getRamChoice() 
+	{
 		return ramChoice.getSelectionModel().getSelectedItem().replace(" ", "").replace("o", "");
 	}
 	
-	private void hideAll() {
+	private void hidefadePane() 
+	{
 		nameField.setDisable(true);
 		passField.setDisable(true);
-		playButtonPane.pane.setVisible(false);
-		optionButton.pane.setVisible(false);
+		
+		Timeline t = new Timeline();
+		
+		KeyFrame frames[] = new KeyFrame[] {
+			new KeyFrame(Duration.millis(125), new KeyValue (fadePane.getFXPane().opacityProperty(), 0)),
+			new KeyFrame(Duration.millis(125), new KeyValue (loadPane.getFXPane().opacityProperty(), 1))
+		};
+		t.setOnFinished(ea->fadePane.hide());
+		
+		t.getKeyFrames().addAll(frames);
+		t.play();
 		
 	}
 	
-	private void showAll() {
-		Platform.runLater(()->nameField.setDisable(false));
-		Platform.runLater(()->passField.setDisable(false));
-		Platform.runLater(()->progressBar.hide());
-		Platform.runLater(()->playButtonPane.pane.setVisible(true));
-		Platform.runLater(()->optionButton.pane.setVisible(true));
+	private void showfadePane() 
+	{
+		Platform.runLater(()->{
+			nameField.setDisable(false);
+			passField.setDisable(false);
+			
+			Timeline t = new Timeline();
+			fadePane.show();
+			KeyFrame frames[] = new KeyFrame[] {
+					new KeyFrame(Duration.millis(125), new KeyValue (fadePane.getFXPane().opacityProperty(), 1)),
+					new KeyFrame(Duration.millis(125), new KeyValue (loadPane.getFXPane().opacityProperty(), 0))
+				};
+			t.setOnFinished(ea->fadePane.getFXPane().toFront());
+			t.getKeyFrames().addAll(frames);
+        	t.play();
+
+			
+		});
+
 	}
 	
-	public static void main(String[] args) {
-        
-		
-		
-		launch(args);
-        
-    }
+	public static void main(String[] args) { launch(args); }
     
     @Override
-    public void start(Stage primaryStage) {
-    	
-    	instance = this;
-    	
-    	
-    	
+    public void start(Stage primaryStage) 
+    {
     	
     	// Properties
     	
-		try {
+		try 
+		{
 			prop = new Properties();
-			prop.load(getClass().getResourceAsStream("/kube/launcher/resources/config.properties"));
-		} catch (Exception e) {
+			prop.load(new FileInputStream(new File("launcher.properties")));
+		} 
+		catch (Exception e) 
+		{
 			e.printStackTrace();
 		}
-
-		
-    	
-    	
     	
     	//Launcher Initialisation
     	
@@ -144,11 +175,10 @@ public class LauncherView extends Application {
     	// Load custom font
     	
     	Font customFont = Font.loadFont(getClass().getResourceAsStream("/kube/launcher/resources/Digital Dare.ttf"), 16);
-
-    	
+	
     	// Windows
     	
-    	primaryStage.setTitle("Launcher");
+    	primaryStage.setTitle("Kube Launcher");
         primaryStage.initStyle(StageStyle.TRANSPARENT);
         primaryStage.getIcons().add(new Image("/kube/launcher/resources/Logo v1.0_partial.png"));
         
@@ -161,12 +191,10 @@ public class LauncherView extends Application {
         
         videoPane = new CustomAnchorPane();
         videoPane.setAllAnchors(8);
-        backPane.getChildren().add(videoPane.pane);
-        
+        backPane.getChildren().add(videoPane.getFXPane());       
         
         // Video Player
         
-       
         Media videoMedia = new Media(getClass().getResource("/kube/launcher/resources/cinematic.mp4").toString());
         MediaPlayer videoPlayer = new MediaPlayer(videoMedia);
         videoPlayer.setAutoPlay(true);
@@ -175,18 +203,18 @@ public class LauncherView extends Application {
         videoViewer = new MediaView(videoPlayer);
         videoViewer.setPreserveRatio(false);
         
-        videoViewer.fitWidthProperty().bind(videoPane.pane.widthProperty());
-        videoViewer.fitHeightProperty().bind(videoPane.pane.heightProperty());
+        videoViewer.fitWidthProperty().bind(videoPane.getFXPane().widthProperty());
+        videoViewer.fitHeightProperty().bind(videoPane.getFXPane().heightProperty());
         
         videoPane.getChildren().add(videoViewer);
-       
+        
         // Fade Pane
         
         fadePane = new CustomAnchorPane();
         fadePane.setBackgroundColor(.7, 0, 0, 0);
         fadePane.setAllAnchors(0);
-        fadePane.setParent(videoPane.pane);
-        
+        fadePane.setParent(videoPane.getFXPane());
+
         // Music player
         
         Media audioMedia = new Media(getClass().getResource("/kube/launcher/resources/sound.mp3").toString());
@@ -194,135 +222,156 @@ public class LauncherView extends Application {
         audioPlayer.setAutoPlay(true);
         audioPlayer.setVolume(0); 
         audioPlayer.setCycleCount(MediaPlayer.INDEFINITE);
+
         
-            
+        // Hover sound
+    	
+    	mediaHoverSound = new Media(getClass().getResource("/kube/launcher/resources/hover.mp3").toString());
+    	playerHoverSound = new MediaPlayer(mediaHoverSound);
+    	playerHoverSound.volumeProperty().bind(Bindings.divide(audioPlayer.volumeProperty(), 5));
+        
+    	// Click sound
+    	
+    	mediaClickSound = new Media(getClass().getResource("/kube/launcher/resources/click.mp3").toString());
+    	playerClickSound = new MediaPlayer(mediaClickSound);
+    	playerClickSound.volumeProperty().bind(Bindings.divide(audioPlayer.volumeProperty(), 3));
+    	
 		// Logo
 		
 		logoView = new ImageView();
 		logoView.setImage(new Image(getClass().getResource("/kube/launcher/resources/KubeLogo.png").toString(), 256, 80, false, false));
 		logoView.relocate(128, 20);
 		fadePane.getChildren().add(logoView);
-		
+
 		// Input Name
 		
 		nameField = new TextField();
 		nameField.relocate(225, 110);
 		fadePane.getChildren().add(nameField);
-		
+
 		// Name Label
 		
-		nameLabel = new javafx.scene.control.Label("Username : ");
-		nameLabel.setFont(customFont);
-		nameLabel.setStyle("-fx-text-fill: #FFFFFF");
-		nameLabel.relocate(100, 110);
-		fadePane.getChildren().addAll(nameLabel);
-		
+		nameLabel = new CustomLabel("Username : ", customFont, Color.WHITE, 100, 110);
+		fadePane.getChildren().add(nameLabel.getFXLabel());
+
 		// Input Pass
 		
 		passField = new PasswordField();
 		passField.relocate(225, 145);
 		fadePane.getChildren().add(passField);
-		
+
 		// Pass Label
 		
-		passLabel = new javafx.scene.control.Label("Password : ");
-		passLabel.setFont(customFont);
-		passLabel.setStyle("-fx-text-fill: #FFFFFF");
-		passLabel.relocate(100, 145);
-		fadePane.getChildren().addAll(passLabel);
-		
+		passLabel = new CustomLabel("Password : ", customFont, Color.WHITE, 100, 145);
+		fadePane.getChildren().add(passLabel.getFXLabel());
+
 		// Quit Label
 		
-		quitLabel = new javafx.scene.control.Label("X");
-		quitLabel.setFont(customFont);
-		quitLabel.setStyle("-fx-text-fill: #A00000");
-		quitLabel.relocate(480, 0);
-		fadePane.getChildren().addAll(quitLabel);
+		quitLabel = new CustomLabel("X", customFont, Color.web("#A00000"), 480, 0);
+		fadePane.getChildren().add(quitLabel.getFXLabel());
 		
-		quitLabel.setOnMouseEntered(e->quitLabel.setStyle(" -fx-text-fill: #FF0000; -fx-cursor:hand;"));
-		quitLabel.setOnMouseExited(e->quitLabel.setStyle(" -fx-text-fill: #A00000; -fx-cursor:normal;"));
-		quitLabel.setOnMouseClicked(e->{
-			Timeline timeline = new Timeline();
-            KeyFrame key = new KeyFrame(Duration.millis(500),
-                           new KeyValue (primaryStage.getScene().getRoot().opacityProperty(), 0));
-            KeyFrame key2 = new KeyFrame(Duration.millis(500),
-                    		new KeyValue (getSoundSlider().valueProperty(), 0));
-            timeline.getKeyFrames().add(key);
-            timeline.getKeyFrames().add(key2);  
-            timeline.setOnFinished((ae) -> System.exit(1)); 
-            timeline.play();	
+		quitLabel.getFXLabel().setOnMouseEntered(e->{
+			quitLabel.setCursor(Cursor.HAND);
+			quitLabel.setFillColor(Color.web("#FF0000"));
+			playerHoverSound.seek(Duration.ZERO);
+			playerHoverSound.play();
+			
 		});
 		
+		quitLabel.getFXLabel().setOnMouseExited(e->{
+			quitLabel.setCursor(Cursor.DEFAULT);
+			quitLabel.setFillColor(Color.web("#A00000"));
+		});
+		
+		quitLabel.getFXLabel().setOnMouseClicked(e->
+		{
+			
+			KeyFrame frames[] = {
+					new KeyFrame(Duration.millis(500), new KeyValue (primaryStage.getScene().getRoot().opacityProperty(), 0)),
+					new KeyFrame(Duration.millis(500), new KeyValue (getSoundSlider().valueProperty(), 0)),
+					new KeyFrame(Duration.millis(50), new KeyValue (optionPane.getFXPane().opacityProperty(), 0))
+			};
+
+			Timeline timeline = new Timeline();
+			timeline.getKeyFrames().setAll(frames);
+			timeline.play();
+			timeline.setOnFinished((ae) -> System.exit(1)); 
+			playerClickSound.seek(Duration.ZERO);
+			playerClickSound.play();
+		});
+
 		// Reduce Label
 		
-		minimizeLabel = new javafx.scene.control.Label("-");
-		minimizeLabel.setFont(customFont);
-		minimizeLabel.setStyle("-fx-text-fill: #AAAAAA");
-		minimizeLabel.relocate(460, 0);
-		fadePane.getChildren().addAll(minimizeLabel);
+		minimizeLabel = new CustomLabel("-", customFont, Color.web("#AAAAAA"), 460, 0); 
+		fadePane.getChildren().add(minimizeLabel.getFXLabel());
 		
-		minimizeLabel.setOnMouseEntered(e->minimizeLabel.setStyle(" -fx-text-fill: #DDDDDD; -fx-cursor:hand;"));
-		minimizeLabel.setOnMouseExited(e->minimizeLabel.setStyle(" -fx-text-fill: #AAAAAA; -fx-cursor:normal;"));
-		minimizeLabel.setOnMouseClicked(e->primaryStage.setIconified(true));
+		minimizeLabel.getFXLabel().setOnMouseEntered(e->
+		{
+			minimizeLabel.setCursor(Cursor.HAND);
+			minimizeLabel.setFillColor(Color.web("#DDDDDD"));
+			playerHoverSound.seek(Duration.ZERO);
+			playerHoverSound.play();
+		});
 		
+		minimizeLabel.getFXLabel().setOnMouseExited(e->
+		{
+			minimizeLabel.setCursor(Cursor.DEFAULT);
+			minimizeLabel.setFillColor(Color.web("#AAAAAA"));
+		});
+		
+		minimizeLabel.getFXLabel().setOnMouseClicked(e->
+		{
+			primaryStage.setIconified(true);
+			playerClickSound.seek(Duration.ZERO);
+			playerClickSound.play();
+		});
+
 		// Option Button
 		
 		optionButton = new CustomAnchorPane();
 		optionButton.setBackgroundImage("/kube/launcher/resources/SettingsButton.png", BackgroundRepeat.ROUND, 20);
 		optionButton.setSize(20, 20);
-		optionButton.setPosition(355, 185);
-		fadePane.getChildren().add(optionButton.pane);
+		optionButton.setPosition(365, 185);
+		fadePane.getChildren().add(optionButton.getFXPane());
 		
-		optionButton.pane.setOnMouseEntered(e->
+		optionButton.getFXPane().setOnMouseEntered(e->
 		{
 			optionButton.setBackgroundImage("/kube/launcher/resources/SettingsButton_selected.png", BackgroundRepeat.ROUND, 20);
-			optionButton.pane.setStyle(optionButton.pane.getStyle() + "; -fx-cursor:hand;");
+			optionButton.getFXPane().setStyle(optionButton.getFXPane().getStyle() + "; -fx-cursor:hand;");
+			playerHoverSound.seek(Duration.ZERO);
+			playerHoverSound.play();
 		});
 		
-		optionButton.pane.setOnMouseExited(e->
+		optionButton.getFXPane().setOnMouseExited(e->
 		{
 			optionButton.setBackgroundImage("/kube/launcher/resources/SettingsButton.png", BackgroundRepeat.ROUND, 20);
-			optionButton.pane.setStyle(optionButton.pane.getStyle() + "; -fx-cursor:normal;");
+			optionButton.getFXPane().setStyle(optionButton.getFXPane().getStyle() + "; -fx-cursor:normal;");
 		});
 		
-		optionButton.pane.setOnMouseClicked(e->
+		optionButton.getFXPane().setOnMouseClicked(e->
 		{
 			optionPane.show();
 			quitLabel.toFront();
 			minimizeLabel.toFront();
 			
 			Timeline timeline = new Timeline();
-			KeyFrame key = new KeyFrame(Duration.millis(250),
-                    new KeyValue (optionPane.pane.opacityProperty(), 1));
-			timeline.getKeyFrames().add(key);
+			timeline.getKeyFrames().add(new KeyFrame(Duration.millis(250), new KeyValue (optionPane.getFXPane().opacityProperty(), 1)));
 	        timeline.play();
-			
+	        playerClickSound.seek(Duration.ZERO);
+			playerClickSound.play();
 		});
-		
-		
-		// Progressbar
-		
-		progressBar = new CustomProgressBar(WIDTH - 42, 16, 2, "/kube/launcher/resources/Lava.gif", customFont, "/kube/launcher/resources/Back.png");
-		progressBar.setPosition(10, HEIGHT - 58);
-		progressBar.hide();
-		fadePane.getChildren().add(progressBar.getFXProgressBar());
-		
-		// Info Label
-		
-		infoLabel = new javafx.scene.control.Label("");
-		infoLabel.setFont(Font.getDefault());
-		infoLabel.setStyle("-fx-text-fill: #FFFFFF");
-		infoLabel.relocate(10, HEIGHT - 35);
-		fadePane.getChildren().addAll(infoLabel);
 		
 		// Sound Informations
 		// Sappheiros
 		
-		soundLabel = new javafx.scene.control.Label("Sound by Sappheiros");
-		soundLabel.setFont(Font.getDefault());
-		soundLabel.setStyle("-fx-text-fill: #FFFFFF");
-		soundLabel.relocate(WIDTH - 140, HEIGHT - 35);
-		fadePane.getChildren().addAll(soundLabel);
+		soundLabel = new CustomLabel("Sound by Sappheiros", Font.getDefault(), Color.WHITE, WIDTH - 140, HEIGHT - 35);
+		fadePane.getChildren().add(soundLabel.getFXLabel());
+		
+		// Version Label
+		
+		versionLabel = new CustomLabel("Version " + VERSION, Font.font(Font.getDefault().getName(), 9), Color.WHITE, 5, 5);
+		fadePane.getChildren().add(versionLabel.getFXLabel());
+		
 		
 		// Play Button
 		
@@ -330,41 +379,48 @@ public class LauncherView extends Application {
 		playButtonPane.setPosition(250, 180);
 		playButtonPane.setBackgroundImage("/kube/launcher/resources/Back.png", BackgroundRepeat.REPEAT, 32);
 		playButtonPane.setSize(96, 32);
-		fadePane.getChildren().add(playButtonPane.pane);
+		fadePane.getChildren().add(playButtonPane.getFXPane());
 		
 		playButton = new CustomAnchorPane();
 		playButton.setBackgroundColor(.9, 0, 0, 0);
 		playButton.setAllAnchors(2);
-		playButtonPane.getChildren().add(playButton.pane);
+		playButtonPane.getChildren().add(playButton.getFXPane());
 		
-		playLabel = new javafx.scene.control.Label("Jouer");
-		playLabel.setFont(customFont);
-		playLabel.setStyle("-fx-text-fill: #FFFFFF");
-		playLabel.relocate(playButton.pane.getWidth() / 2 + 15, playButton.pane.getHeight() / 2 + 5);
-		playButton.getChildren().addAll(playLabel);
+		playLabel = new CustomLabel("Jouer", customFont, Color.WHITE, playButton.getFXPane().getWidth() / 2 + 15, playButton.getFXPane().getHeight() / 2 + 5);
+		playButton.getChildren().add(playLabel.getFXLabel());
 		
-		playButton.pane.setOnMouseEntered(e->
+		playButton.getFXPane().setOnMouseEntered(e->
 		{
-			playButton.pane.setStyle("-fx-background-color:rgba(0, 0, 0, 0.3);"
-					+ "-fx-cursor:hand;");
+			playButton.setBackgroundColor(Color.rgb(0, 0, 0, .3));
+			playButton.setCursor(Cursor.HAND);
+			playerHoverSound.seek(Duration.ZERO);
+			playerHoverSound.play();
 		});
-		playButton.pane.setOnMouseExited(e->
+		playButton.getFXPane().setOnMouseExited(e->
 		{
-			playButton.pane.setStyle("-fx-background-color:rgba(0, 0, 0, 0.9);"
-					+ "-fx-cursor:normal;");
+			playButton.setBackgroundColor(Color.rgb(0, 0, 0, .9));
+			playButton.setCursor(Cursor.DEFAULT);
 		});
 		
-		playButton.pane.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>(){
+		playButton.getFXPane().addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>()
+		{
 			@Override
 			public void handle(MouseEvent event) 
 			{
-				hideAll();
+				
+				playerClickSound.seek(Duration.ZERO);
+				playerClickSound.play();
+				
 				if (nameField.getText().replaceAll(" ", "").length() == 0 || passField.getText().length() == 0)
 				{
-					new CustomAlert(AlertType.ERROR, "Erreur", "Erreur dans la saisie", "Des champs sont vides !");
-					showAll();
+					new CustomAlert(AlertType.Error, "Erreur", "Erreur dans la saisie", "Des champs sont vides !");
+					showfadePane();
 					return;
 				}
+				
+				
+				hidefadePane();
+				
 				
 				Thread t = new Thread()
 				{
@@ -377,9 +433,9 @@ public class LauncherView extends Application {
 						}
 						catch (AuthenticationException e)
 						{
-							Platform.runLater(()->new CustomAlert(AlertType.ERROR, "Erreur", "Impossible de se connecter", e.getErrorModel().getErrorMessage()));
+							Platform.runLater(()->new CustomAlert(AlertType.Error, "Erreur", "Impossible de se connecter", e.getErrorModel().getErrorMessage()));
 							Platform.runLater(()->infoLabel.setText(""));
-							showAll();
+							showfadePane();
 							
 							return;
 						}
@@ -393,9 +449,9 @@ public class LauncherView extends Application {
 						catch (Exception e)
 						{
 							Launcher.interruptThread();
-							Platform.runLater(()->new CustomAlert(AlertType.ERROR, "Erreur", "Mise à jour impossible", e.getStackTrace().toString()));
+							Platform.runLater(()->new CustomAlert(AlertType.Error, "Erreur", "Mise à jour impossible", e.getStackTrace().toString()));
 							Platform.runLater(()->infoLabel.setText(""));
-							showAll();
+							showfadePane();
 							return;
 						}
 
@@ -406,9 +462,9 @@ public class LauncherView extends Application {
 						catch (LaunchException e)
 						{
 							Launcher.interruptThread();
-							Platform.runLater(()->new CustomAlert(AlertType.ERROR, "Erreur", "Impossible de lancer le jeu", e.getStackTrace().toString()));
+							Platform.runLater(()->new CustomAlert(AlertType.Error, "Erreur", "Impossible de lancer le jeu", e.getStackTrace().toString()));
 							Platform.runLater(()->infoLabel.setText(""));
-							showAll();
+							showfadePane();
 							return;
 						}
 					}
@@ -426,32 +482,23 @@ public class LauncherView extends Application {
 		optionPane.setAllAnchors(0);
 		optionPane.setBackgroundColor(1, 0, 0, 0);
 		optionPane.hide();
-		optionPane.pane.setOpacity(0);
-		fadePane.getChildren().add(optionPane.pane);
+		optionPane.getFXPane().setOpacity(0);
+		fadePane.getChildren().add(optionPane.getFXPane());
 		
 		// Option Title Label
 		
-		optionTitleLabel = new javafx.scene.control.Label("Options");
-		optionTitleLabel.setFont(customFont);
-		optionTitleLabel.setStyle("-fx-text-fill: #FFFFFF");
-		optionTitleLabel.relocate(220, 10);
-		optionPane.getChildren().addAll(optionTitleLabel);
+		optionTitleLabel = new CustomLabel("Options", customFont, Color.WHITE, 220, 10);
+		optionPane.getChildren().add(optionTitleLabel.getFXLabel());
 		
 		// Sound Label
 		
-		optionSoundLabel = new javafx.scene.control.Label("Volume : ");
-		optionSoundLabel.setFont(customFont);
-		optionSoundLabel.setStyle("-fx-text-fill: #FFFFFF;");
-		optionSoundLabel.relocate(130, 80);
-		optionPane.getChildren().addAll(optionSoundLabel);
+		optionSoundLabel = new CustomLabel("Volume : ", customFont, Color.WHITE, 130, 80);
+		optionPane.getChildren().add(optionSoundLabel.getFXLabel());
 		
 		// Sound Label Percentage
 		
-		optionSoundLabelPercentage = new javafx.scene.control.Label(String.valueOf((int)(audioPlayer.getVolume() * 100)) + "%");
-		optionSoundLabelPercentage.setFont(customFont);
-		optionSoundLabelPercentage.setStyle("-fx-text-fill: #FFFFFF;");
-		optionSoundLabelPercentage.relocate(380, 80);
-		optionPane.getChildren().addAll(optionSoundLabelPercentage);
+		optionSoundLabelPercentage = new CustomLabel(String.valueOf((int)(audioPlayer.getVolume() * 100)) + "%", customFont, Color.WHITE, 380, 80);
+		optionPane.getChildren().add(optionSoundLabelPercentage.getFXLabel());
 		
 		// Sound Slider
 		
@@ -463,14 +510,14 @@ public class LauncherView extends Application {
 		optionPane.getChildren().add(soundSlider);
 		
 		audioPlayer.volumeProperty().bind(Bindings.divide(soundSlider.valueProperty(), 100));
-		optionSoundLabelPercentage.textProperty().bind(Bindings.format("%.0f%%", soundSlider.valueProperty()));
+		optionSoundLabelPercentage.getFXLabel().textProperty().bind(Bindings.format("%.0f%%", soundSlider.valueProperty()));
 		
 		soundSlider.setOnMouseReleased(e->
 		{
 			prop.setProperty("soundLevel", String.valueOf((int)getSoundSlider().getValue()));
 			try 
 			{
-				prop.store(new FileOutputStream(getClass().getResource("/kube/launcher/resources/config.properties").getFile()), null);
+				prop.store(new FileOutputStream(new File("launcher.properties")), null);
 			} 
 			catch (Exception ex) 
 			{
@@ -490,7 +537,7 @@ public class LauncherView extends Application {
 			prop.setProperty("ramSelection", String.valueOf(ramChoice.getSelectionModel().getSelectedIndex()));
 			try 
 			{
-				prop.store(new FileOutputStream(getClass().getResource("/kube/launcher/resources/config.properties").getFile()), null);
+				prop.store(new FileOutputStream(new File("launcher.properties")), null);
 			} 
 			catch (Exception ex) 
 			{
@@ -502,44 +549,101 @@ public class LauncherView extends Application {
 		
 		// Choice Ram Label
 		
-		ramChoiceLabel = new javafx.scene.control.Label("Memoire : ");
-		ramChoiceLabel.setFont(customFont);
-		ramChoiceLabel.setStyle("-fx-text-fill: #FFFFFF;");
-		ramChoiceLabel.relocate(122, 118);
-		optionPane.getChildren().addAll(ramChoiceLabel);
+		ramChoiceLabel = new CustomLabel("Memoire : ", customFont, Color.WHITE, 112, 118);
+		optionPane.getChildren().add(ramChoiceLabel.getFXLabel());
 		
+		// Local CheckBox
+		if (Boolean.parseBoolean(prop.getProperty("localCheckbox")))
+		{
+			localBox = new CheckBox("Local");
+			localBox.relocate(112, 150);
+			localBox.setFont(Font.getDefault());
+			localBox.setTextFill(Color.WHITE);
+			optionPane.getChildren().add(localBox);
+			localBox.setOnAction(e->
+			{
+				if(localBox.isSelected()) 
+				{
+					Launcher.setServerAddress("192.168.1.25");
+				}
+				else 
+				{
+					Launcher.setServerAddress("robin-leclair.ovh");
+				}
+				
+				
+			});
+			
+		}
+
 		// Back Label
 		
-		backLabel = new javafx.scene.control.Label("<<");
-		backLabel.setFont(customFont);
-		backLabel.setStyle("-fx-text-fill: #AAAAAA;");
-		backLabel.relocate(10, HEIGHT - 40);
+		backLabel = new CustomLabel("<<", customFont, Color.web("#AAAAAA"), 10, HEIGHT - 40);
+		optionPane.getChildren().add(backLabel.getFXLabel());
 		
-		
-		optionPane.getChildren().addAll(backLabel);
-		
-		backLabel.setOnMouseEntered(e->{
-			backLabel.setStyle("-fx-text-fill: #FFFFFF;"
-					+ "-fx-cursor:hand;");
+		backLabel.getFXLabel().setOnMouseEntered(e->
+		{
+			backLabel.setFillColor(Color.WHITE);
+			backLabel.setCursor(Cursor.HAND);
+			playerHoverSound.seek(Duration.ZERO);
+			playerHoverSound.play();
 		});
 		
-		backLabel.setOnMouseExited(e->{
-			backLabel.setStyle("-fx-text-fill: #AAAAAA;"
-					+ "-fx-cursor:normal;");
+		backLabel.getFXLabel().setOnMouseExited(e->
+		{
+			backLabel.setFillColor(Color.web("#AAAAAA"));
+			backLabel.setCursor(Cursor.DEFAULT);
 		});
 		
 		
-		backLabel.setOnMouseClicked(e->{
+		backLabel.getFXLabel().setOnMouseClicked(e->
+		{
 			Timeline timeline = new Timeline();
-			KeyFrame key = new KeyFrame(Duration.millis(250),
-                    new KeyValue (optionPane.pane.opacityProperty(), 0));
-			timeline.getKeyFrames().add(key);
+			timeline.getKeyFrames().add(new KeyFrame(Duration.millis(250), new KeyValue (optionPane.getFXPane().opacityProperty(), 0)));
 			timeline.setOnFinished(ea->optionPane.hide());
 	        timeline.play();
+	        playerClickSound.seek(Duration.ZERO);
+			playerClickSound.play();
 		});
 		
+		// Load Pane
+		loadPane = new CustomAnchorPane();
+		loadPane.setAllAnchors(0);
+		loadPane.setOpacity(0);
+		loadPane.setBackgroundColor(Color.TRANSPARENT);
+		videoPane.getChildren().add(loadPane.getFXPane());
 		
-        primaryStage.setScene(new Scene(backPane.pane, WIDTH, HEIGHT, javafx.scene.paint.Color.TRANSPARENT));
+		// Loadfade Pane
+		
+		loadfadePane = new CustomAnchorPane();
+		loadfadePane.setAnchor(AnchorType.Top, 0);
+		loadfadePane.setAnchor(AnchorType.Left, 0);
+		loadfadePane.setAnchor(AnchorType.Right, 0);
+		loadfadePane.setSize(0, 16);
+		loadfadePane.setBackgroundColor(0.8, 0, 0, 0);
+		loadPane.getChildren().add(loadfadePane.getFXPane());
+		
+		
+		// Load Label
+		
+		loadLabel = new CustomLabel("Chargement...", customFont, Color.WHITE, WIDTH / 2 - 75, 0);
+		loadfadePane.getChildren().add(loadLabel.getFXLabel());
+		
+		// Info Label
+		
+		infoLabel = new CustomLabel("", Font.getDefault(), Color.WHITE, 10, HEIGHT - 35);
+		loadPane.getChildren().add(infoLabel.getFXLabel());
+		
+		// Progressbar
+		
+		progressBar = new CustomProgressBar(WIDTH - 42, 16, 2, "/kube/launcher/resources/Lava.gif", customFont, "/kube/launcher/resources/Back.png");
+		progressBar.setPosition(10, HEIGHT - 58);
+		progressBar.hide();
+		loadPane.getFXPane().getChildren().add(progressBar.getFXProgressBar());
+		
+		fadePane.getFXPane().toFront();
+		
+        primaryStage.setScene(new Scene(backPane.getFXPane(), WIDTH, HEIGHT, javafx.scene.paint.Color.TRANSPARENT));
         this.primaryStage = primaryStage;
        
         // FadeIn
@@ -547,47 +651,15 @@ public class LauncherView extends Application {
         primaryStage.getScene().getRoot().setOpacity(0);
         primaryStage.show();
         Timeline timeline = new Timeline();
-        KeyFrame key = new KeyFrame(Duration.millis(500),
-                       new KeyValue (primaryStage.getScene().getRoot().opacityProperty(), 1));
-        KeyFrame key2 = new KeyFrame(Duration.millis(500),
-        				new KeyValue (soundSlider.valueProperty(), Integer.parseInt(prop.getProperty("soundLevel"))));
         
-        timeline.getKeyFrames().add(key);
-        timeline.getKeyFrames().add(key2);
+        KeyFrame frames[] = new KeyFrame[] {
+        		new KeyFrame(Duration.millis(500), new KeyValue (primaryStage.getScene().getRoot().opacityProperty(), 1)),
+        		new KeyFrame(Duration.millis(500), new KeyValue (soundSlider.valueProperty(), Integer.parseInt(prop.getProperty("soundLevel"))))
+        };
+        timeline.getKeyFrames().addAll(frames);
         timeline.play();
         
-        // Timer inactivity
-        timer = new Timer();
-        task = null;
-        primaryStage.getScene().setOnMouseMoved(e->{
-        	Timeline t = new Timeline();
-        	KeyFrame k = new KeyFrame(Duration.millis(150),
-                    new KeyValue (fadePane.pane.opacityProperty(), 1));
-        	t.getKeyFrames().add(k);
-        	t.play();
-        	primaryStage.getScene().setCursor(Cursor.DEFAULT);
-        	
-        	if (task != null)
-        		task.cancel();
-        	task = new TimerTask() {
-                public void run() {
-                	Timeline t = new Timeline();
-                	KeyFrame key = new KeyFrame(Duration.millis(3000),
-                            new KeyValue (fadePane.pane.opacityProperty(), 0));
-                	t.getKeyFrames().add(key);
-                	
-                	t.play();
-                	primaryStage.getScene().setCursor(Cursor.NONE);
-                	
-                	task.cancel();
-                }
-        	};
-        	
-            timer.schedule(task, 10000);
-        });
         
     }
-
-
     
 }

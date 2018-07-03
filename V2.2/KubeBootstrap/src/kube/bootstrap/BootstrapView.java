@@ -5,12 +5,15 @@ import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Duration;
-import kube.bootstrap.CustomAnchorPane;
+import kube.utils.CustomAnchorPane;
+import kube.utils.CustomProgressBar;
 
 public class BootstrapView extends Application {
 	
@@ -20,6 +23,8 @@ public class BootstrapView extends Application {
 	private CustomProgressBar progressbar;
 	private CustomAnchorPane backPane;
 	private ImageView logoView;
+	private Label loadLabel;
+	
 	
 	private Stage primaryStage;
 	
@@ -54,6 +59,8 @@ public class BootstrapView extends Application {
 		Bootstrap.setBootstrapView(this);
 		this.primaryStage = primaryStage;
     	
+		Font customFont = Font.loadFont(getClass().getResourceAsStream("/kube/bootstrap/resources/Digital Dare.ttf"), 16);
+		
     	// Windows
     	
     	primaryStage.setTitle("Kube Bootstrap");
@@ -73,6 +80,12 @@ public class BootstrapView extends Application {
 		backPane.getChildren().add(logoView);
         
 		
+		loadLabel = new javafx.scene.control.Label("Chargement...");
+		loadLabel.setFont(customFont);
+		loadLabel.setStyle("-fx-text-fill: #FFFFFF");
+		loadLabel.relocate(WIDTH - 250, HEIGHT - 20);
+		backPane.getChildren().add(loadLabel);
+		
 		// Progressbar
 		
 		//progressbar = new CustomProgressBar(WIDTH - 42, 16, 2, "/kube/bootstrap/resources/Lava.gif", customFont, "/kube/bootstrap/resources/Back.png");
@@ -81,7 +94,7 @@ public class BootstrapView extends Application {
 		//frontPane.getChildren().add(progressbar.getFXProgressBar());
 		
 		
-        primaryStage.setScene(new Scene(backPane.pane, WIDTH, HEIGHT, javafx.scene.paint.Color.TRANSPARENT));
+        primaryStage.setScene(new Scene(backPane.getFXPane(), WIDTH, HEIGHT, javafx.scene.paint.Color.TRANSPARENT));
        
         // FadeIn
         
@@ -92,6 +105,11 @@ public class BootstrapView extends Application {
                        new KeyValue (primaryStage.getScene().getRoot().opacityProperty(), 1));
         timeline.getKeyFrames().add(key);
         timeline.play();
+        
+        
+        
+        
+        // 
         
         
 		Thread t = new Thread(){

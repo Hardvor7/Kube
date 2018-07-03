@@ -16,6 +16,7 @@ import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.util.Duration;
+import kube.utils.ResourcesUtil;
 
 public class Bootstrap {
 	
@@ -64,11 +65,14 @@ public class Bootstrap {
 				}
 			}
 		};
-		try {
+		try 
+		{
 			barUpdateThread.start();
 			su.start();
 			barUpdateThread.interrupt();
-		} catch (Exception e) {
+		} 
+		catch (Exception e) 
+		{
 			e.printStackTrace();
 		}
 		
@@ -78,12 +82,22 @@ public class Bootstrap {
 
 	public static void launch()
 	{
+		try 
+		{
+			new ResourcesUtil(System.getenv("APPDATA") + "/.Kube/Launcher", null);
+		} 
+		catch (Exception e) 
+		{
+			e.printStackTrace();
+		}
+		
+		
 		ClasspathConstructor constructor = new ClasspathConstructor();
 
 		ExploredDirectory gameDir = Explorer.dir(K_B_DIR);
 		constructor.add(gameDir.sub("launcher_lib").allRecursive().files().match(".*\\.((jar)$)*$"));
 		constructor.add(gameDir.get("launcher.jar"));
-
+		
 		ExternalLaunchProfile profile = new ExternalLaunchProfile("kube.launcher.LauncherView",
 				constructor.make());
 		ExternalLauncher launcher = new ExternalLauncher(profile);
@@ -99,7 +113,7 @@ public class Bootstrap {
 		}
 		
 		try {
-			Thread.sleep(5000L);
+			Thread.sleep(500L);
 		} catch (InterruptedException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
